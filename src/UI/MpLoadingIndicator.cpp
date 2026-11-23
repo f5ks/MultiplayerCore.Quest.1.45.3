@@ -50,7 +50,7 @@ namespace MultiplayerCore::UI {
 
     void MpLoadingIndicator::Initialize() {
         BSML::parse_and_construct(Assets::LoadingIndicator_bsml, _screenController->get_transform(), this);
-        auto existingLoadingControl = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::LoadingControl*>()->First()->gameObject;
+        auto existingLoadingControl = UnityEngine::Resources::FindObjectsOfTypeAll<GlobalNamespace::LoadingControl*>().front()->gameObject;
         auto go = UnityEngine::Object::Instantiate(existingLoadingControl, vert->get_transform());
         _loadingControl = go->GetComponent<GlobalNamespace::LoadingControl*>();
         _loadingControl->Hide();
@@ -64,7 +64,7 @@ namespace MultiplayerCore::UI {
             return;
         } else if (
             _screenController->get_countdownShown() &&
-            _sessionManager->get_syncTime() >= _gameStateController->get_startTime() &&
+            _sessionManager->i___GlobalNamespace__IMultiplayerSessionManager_1___GlobalNamespace__IBeatSaberConnectedPlayer__()->get_syncTime() >= _gameStateController->get_startTime() &&
             _gameStateController->get_levelStartInitiated() &&
             _levelLoader->_gameplaySetupData != nullptr
         ) {

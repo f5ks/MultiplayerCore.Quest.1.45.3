@@ -166,8 +166,8 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
         requires(std::is_pointer_v<TPacket>)
         void SendToServer(TPacket packet) {
             /* TODO: try catch, logging? */
-            if (_sessionManager) {
-                _sessionManager->SendToPlayer(packet->i_INetSerializable(), connectionOwner);
+            if (auto owner = get_connectionOwner()) {
+                SendToPlayer(packet, owner);
             }
         }
 
@@ -175,7 +175,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
         requires(std::is_pointer_v<TPacket>)
         void SendToPlayer(TPacket packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
             /* TODO: try catch, logging? */
-            if (_sessionManager) {
+            if (_sessionManager && player) {
                 _sessionManager->SendToPlayer(packet->i_INetSerializable(), player->i___GlobalNamespace__IConnectedPlayer());
             }
         }

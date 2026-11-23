@@ -1,4 +1,5 @@
 #include "NodePoseSyncState/MpNodePoseSyncStateManager.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "logging.hpp"
 DEFINE_TYPE(MultiplayerCore::NodePoseSyncState, MpNodePoseSyncStateManager);
 
@@ -25,7 +26,7 @@ namespace MultiplayerCore::NodePoseSyncState {
     }
 
     void MpNodePoseSyncStateManager::HandleNodePoseSyncUpdateReceived(MpNodePoseSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
-        if (player->get_isConnectionOwner()) {
+        if (player->i___GlobalNamespace__IConnectedPlayer()->get_isConnectionOwner()) {
             DEBUG("Updating node pose sync frequency to following values: delta: {}ms, full: {}ms", data->deltaUpdateFrequencyMs, data->fullStateUpdateFrequencyMs);
             bool shouldForceUpdate = deltaUpdateFrequencyMs != data->deltaUpdateFrequencyMs || fullStateUpdateFrequencyMs != data->fullStateUpdateFrequencyMs;
             deltaUpdateFrequencyMs = data->deltaUpdateFrequencyMs;

@@ -1,4 +1,5 @@
 #include "Networking/MpPacketSerializer.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "logging.hpp"
 
 #include "System/Type.hpp"

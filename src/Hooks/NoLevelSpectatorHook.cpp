@@ -1,3 +1,4 @@
+#include "GlobalNamespace/GameMode.hpp"
 #include "beatsaber-hook/shared/byref.hpp"
 #include "hooking.hpp"
 #include "logging.hpp"
@@ -15,7 +16,7 @@ using namespace MultiplayerCore;
 #include "GlobalNamespace/LobbyGameStateController.hpp"
 #include "GlobalNamespace/ILevelGameplaySetupData.hpp"
 #include "GlobalNamespace/IBeatmapLevelData.hpp"
-#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupDataSO.hpp"
+#include "GlobalNamespace/MultiplayerLevelScenesTransitionSetupData.hpp"
 #include "GlobalNamespace/PlayerDataModel.hpp"
 #include "GlobalNamespace/PlayerData.hpp"
 #include "GlobalNamespace/MenuTransitionsHelper.hpp"
@@ -36,8 +37,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::Glo
     INFO("LobbyGameStateController_StartMultiplayerLevel");
     _mpPlayersDataModel = i2c::try_cast<Objects::MpPlayersDataModel*>(self->_lobbyPlayersDataModel);
     _mpLevelProvider = _mpPlayersDataModel ? _mpPlayersDataModel->_beatmapLevelProvider : _mpLevelProvider;
-    static GlobalNamespace::BeatmapKey key;
-    key = gameplaySetupData ? gameplaySetupData->beatmapKey : GlobalNamespace::BeatmapKey();
+    auto key = gameplaySetupData ? gameplaySetupData->beatmapKey : GlobalNamespace::BeatmapKey();
     auto hash  = key.IsValid() ? HashFromLevelID(key.levelId) : "";
 
     DEBUG("Check gameplaySetupData ptr {}, beatmapLevelData ptr {}, mpPlayerDataModel ptr {}, mpLevelProvider ptr {}, hash {}", fmt::ptr(gameplaySetupData), fmt::ptr(beatmapLevelData), fmt::ptr(_mpPlayersDataModel), fmt::ptr(_mpLevelProvider), hash);
@@ -53,7 +53,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::Glo
         self->countdownStarted = false;
         self->StopListeningToGameStart(); // Ensure we stop listening for the start event while we run our start task
 
-        BSML::MainThreadScheduler::AwaitFuture(beatmapLevelFut, [beatmapLevelFut, hash, self, gameplaySetupData, beatmapLevelData, beforeSceneSwitchCallback]() mutable -> void {
+        BSML::MainThreadScheduler::AwaitFuture(beatmapLevelFut, [beatmapLevelFut, hash, key, self, gameplaySetupData, beatmapLevelData, beforeSceneSwitchCallback]() mutable -> void {
             if (self->countdownStarted) return; // Another countdown has started, don't start the level
 
             GlobalNamespace::BeatmapLevel* beatmapLevel = beatmapLevelFut.get();
@@ -63,19 +63,17 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::Glo
             }
             // GlobalNamespace::BeatmapLevel* beatmapLevel = Beatmaps::NoInfoBeatmapLevel::New_ctor(hash);
             _mpLevelProvider->AddBasicBeatmapDataToLevel(beatmapLevel, key);
-
-            static ConstString gameModeText = "Multiplayer";
-            self->_menuTransitionsHelper->StartMultiplayerLevel(gameModeText, by_ref(key), beatmapLevel, beatmapLevelData,
-                self->_playerDataModel->playerData->colorSchemesSettings->GetOverrideColorScheme(), gameplaySetupData->gameplayModifiers, 
-                self->_playerDataModel->playerData->playerSpecificSettings, nullptr, BGLib::Polyglot::Localization::Get("BUTTON_MENU"), 
-                false, 
+            self->_menuTransitionsHelper->StartMultiplayerLevel(GlobalNamespace::GameMode::Multiplayer, by_ref(key).as_const(), beatmapLevel, beatmapLevelData,
+                self->_playerDataModel->playerData->colorSchemesSettings->GetOverrideColorScheme(), gameplaySetupData->gameplayModifiers,
+                self->_playerDataModel->playerData->playerSpecificSettings, self->_environmentsListModel, nullptr, BGLib::Polyglot::Localization::Get("BUTTON_MENU"),
+                false,
                 beforeSceneSwitchCallback,
-                custom_types::MakeDelegate<System::Action_2<::UnityW<GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO>, GlobalNamespace::MultiplayerResultsData*>*>(
-                    self, 
-                    (std::function<void(GlobalNamespace::LobbyGameStateController*, GlobalNamespace::MultiplayerLevelScenesTransitionSetupDataSO*, GlobalNamespace::MultiplayerResultsData*)>)&GlobalNamespace::LobbyGameStateController::HandleMultiplayerLevelDidFinish
+                custom_types::MakeDelegate<System::Action_2<GlobalNamespace::MultiplayerLevelScenesTransitionSetupData*, GlobalNamespace::MultiplayerResultsData*>*>(
+                    self,
+                    (std::function<void(GlobalNamespace::LobbyGameStateController*, GlobalNamespace::MultiplayerLevelScenesTransitionSetupData*, GlobalNamespace::MultiplayerResultsData*)>)&GlobalNamespace::LobbyGameStateController::HandleMultiplayerLevelDidFinish
                 ),
                 custom_types::MakeDelegate<System::Action_1<GlobalNamespace::DisconnectedReason>*>(
-                    self, 
+                    self,
                     (std::function<void(GlobalNamespace::LobbyGameStateController*, GlobalNamespace::DisconnectedReason)>)&GlobalNamespace::LobbyGameStateController::HandleMultiplayerLevelDidDisconnect
                 )
             );
@@ -90,7 +88,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::Glo
     LobbyGameStateController_StartMultiplayerLevel(self, gameplaySetupData, beatmapLevelData, beforeSceneSwitchCallback);
 }
 
-MAKE_HOOK_MATCH(MultiplayerResultsViewController_Init, &::GlobalNamespace::MultiplayerResultsViewController::Init, void, GlobalNamespace::MultiplayerResultsViewController* self, GlobalNamespace::MultiplayerResultsData* multiplayerResultsData, GlobalNamespace::BeatmapKey beatmapKey,  bool showBackToLobbyButton, bool showBackToMenuButton) {
+MAKE_AUTO_HOOK_MATCH(MultiplayerResultsViewController_Init, &::GlobalNamespace::MultiplayerResultsViewController::Init, void, GlobalNamespace::MultiplayerResultsViewController* self, GlobalNamespace::MultiplayerResultsData* multiplayerResultsData, GlobalNamespace::BeatmapKey beatmapKey,  bool showBackToLobbyButton, bool showBackToMenuButton) {
     INFO("MultiplayerResultsViewController_Init");
     MultiplayerResultsViewController_Init(self, multiplayerResultsData, beatmapKey, showBackToLobbyButton, showBackToMenuButton);
     auto hash = HashFromLevelID(beatmapKey.levelId);
@@ -107,7 +105,7 @@ MAKE_HOOK_MATCH(MultiplayerResultsViewController_Init, &::GlobalNamespace::Multi
             if (!beatmapLevel) {
                 beatmapLevel = Beatmaps::NoInfoBeatmapLevel::New_ctor(hash);
             }
-            self->_levelBar->Setup(beatmapLevel, beatmapKey.difficulty, beatmapKey.beatmapCharacteristic);
+            self->_levelBar->Setup(beatmapLevel, beatmapKey.difficulty, beatmapKey.characteristic);
             self->_levelBar->hide = false;
         });
     }

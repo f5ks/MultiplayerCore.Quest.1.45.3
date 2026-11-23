@@ -1,4 +1,5 @@
 #include "ScoreSyncState/MpScoreSyncStateManager.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 
 DEFINE_TYPE(MultiplayerCore::ScoreSyncState, MpScoreSyncStateManager);
 
@@ -25,7 +26,7 @@ namespace MultiplayerCore::ScoreSyncState {
     }
 
     void MpScoreSyncStateManager::HandleScoreSyncUpdateReceived(MpScoreSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
-        if (player->get_isConnectionOwner()) {
+        if (player->i___GlobalNamespace__IConnectedPlayer()->get_isConnectionOwner()) {
             DEBUG("Updating score sync frequency to following values: delta: {}ms, full: {}ms", data->deltaUpdateFrequencyMs, data->fullStateUpdateFrequencyMs);
             bool shouldForceUpdate = deltaUpdateFrequencyMs != data->deltaUpdateFrequencyMs || fullStateUpdateFrequencyMs != data->fullStateUpdateFrequencyMs;
             deltaUpdateFrequencyMs = data->deltaUpdateFrequencyMs;

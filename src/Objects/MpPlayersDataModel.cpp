@@ -1,4 +1,5 @@
 #include "beatsaber-hook/shared/byref.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "Objects/MpPlayersDataModel.hpp"
 #include "Beatmaps/Packets/MpBeatmapPacket.hpp"
 #include "logging.hpp"
@@ -55,7 +56,7 @@ namespace MultiplayerCore::Objects {
         DEBUG("'{}' selected song '{}'", player->i___GlobalNamespace__IConnectedPlayer()->get_userId(), packet->levelHash);
         GlobalNamespace::BeatmapCharacteristic characteristic;
         if (!GlobalNamespace::BeatmapCharacteristicExtensions::BeatmapCharacteristicFromSerializedName(packet->characteristic, by_ref(characteristic))) return;
-        auto beatmapKey = GlobalNamespace::BeatmapKey(fmt::format("custom_level_{}", packet->levelHash), GlobalNamespace::GameplayType::BeatSaber, characteristic, packet->difficulty);
+        auto beatmapKey = GlobalNamespace::BeatmapKey(characteristic, packet->difficulty, fmt::format("custom_level_{}", packet->levelHash), GlobalNamespace::GameplayType::BeatSaber);
 
         PutPlayerPacket(player->i___GlobalNamespace__IConnectedPlayer()->userId, packet);
         SetPlayerBeatmapLevel(player->i___GlobalNamespace__IConnectedPlayer()->userId, beatmapKey);

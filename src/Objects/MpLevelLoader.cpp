@@ -1,3 +1,4 @@
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
 #include "GlobalNamespace/IMultiplayerSessionManager_1.hpp"
 #include "Objects/MpLevelLoader.hpp"

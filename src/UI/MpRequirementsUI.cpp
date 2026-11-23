@@ -1,3 +1,4 @@
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
 #include "beatsaber-hook/shared/listw.hpp"
 #include "UI/MpRequirementsUI.hpp"
 #include "Beatmaps/Abstractions/MpBeatmapLevel.hpp"
@@ -93,7 +94,7 @@ namespace MultiplayerCore::UI {
         if (!key.IsValid()) return;
 
         auto levelId = key.levelId;
-        auto localLevel = _beatmapLevelsModel->GetBeatmapLevel(levelId);
+        auto localLevel = _beatmapLevelsModel->GetBeatmapLevel(levelId, false);
         if (localLevel) { // we got a level to set reqs from
             SetRequirementsFromLevel(localLevel, key);
             return;
@@ -182,7 +183,7 @@ namespace MultiplayerCore::UI {
 
                 // DEBUG("Setting requirements from custom level, level details ptr: {}", fmt::ptr(&levelDetailsOpt.value()));
                 auto& levelDetails = levelDetailsOpt->get();
-                auto difficultyDetailsOpt = levelDetails.TryGetCharacteristicAndDifficulty(beatmapKey.beatmapCharacteristic->serializedName, beatmapKey.difficulty);
+                auto difficultyDetailsOpt = levelDetails.TryGetCharacteristicAndDifficulty(GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(beatmapKey.characteristic), beatmapKey.difficulty);
 
                 if (difficultyDetailsOpt.has_value()) {
                     auto& difficultyDetails = difficultyDetailsOpt->get();
@@ -325,7 +326,7 @@ namespace MultiplayerCore::UI {
     UnityEngine::Sprite* MpRequirementsUI::get_##icon##Icon() { \
         if (!_##icon##Icon || _##icon##Icon->m_CachedPtr.IsNull()) { \
             auto& data = Assets::icon##_png;\
-            _##icon##Icon = BSML::Utilities::LoadSpriteRaw(data);\
+            _##icon##Icon = BSML::Utilities::LoadSpriteRaw(ArrayW<uint8_t>(i2c::view<uint8_t>{static_cast<std::span<uint8_t>>(data)}));\
         }\
         return _##icon##Icon;\
     }

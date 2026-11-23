@@ -1,3 +1,5 @@
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "beatsaber-hook/shared/byref.hpp"
 #include "beatsaber-hook/shared/listw.hpp"
 #include "UI/MpPerPlayerUI.hpp"
@@ -69,7 +71,7 @@ namespace MultiplayerCore::UI {
         _gameStateController = gameServerLobbyFlowCoordinator->_lobbyGameStateController;
         _beatmapLevelsModel = beatmapLevelsModel;
         auto sessManOpt = i2c::try_cast<GlobalNamespace::BeatSaberMultiplayerSessionManager*>(sessionManager);
-        if (!sessManOpt.has_value()) {
+        if (!sessManOpt) {
             CRITICAL("Failed to cast IBeatSaberMultiplayerSessionManager to BeatSaberMultiplayerSessionManager, throwing runtime_error...");
             throw std::runtime_error("Failed to cast IBeatSaberMultiplayerSessionManager to BeatSaberMultiplayerSessionManager");
         }
@@ -180,7 +182,7 @@ namespace MultiplayerCore::UI {
                 skipUpdateHandler = false;
 
                 // Request Updated state
-                _multiplayerSessionManager->Send(Players::Packets::GetMpPerPlayerPacket::New_ctor());
+                _packetSerializer->Send(Players::Packets::GetMpPerPlayerPacket::New_ctor());
             }
         }
 
@@ -230,22 +232,22 @@ namespace MultiplayerCore::UI {
 
     void MpPerPlayerUI::HandleMpPerPlayerPacket(Players::Packets::MpPerPlayerPacket* packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         // HandleMpPerPlayerPacket
-        DEBUG("Received MpPerPlayerPacket from {}|{} with values PPDEnabled: {} PPMEnabled: {}", player->userName, player->userId, packet->PPDEnabled, packet->PPMEnabled);
+        DEBUG("Received MpPerPlayerPacket from {}|{} with values PPDEnabled: {} PPMEnabled: {}", player->i___GlobalNamespace__IConnectedPlayer()->userName, player->i___GlobalNamespace__IConnectedPlayer()->userId, packet->PPDEnabled, packet->PPMEnabled);
         
         // Check if player is party Owner
-        if (ppdt && ppmt && player->get_isConnectionOwner() && (packet->PPDEnabled != ppdt->get_Value() || packet->PPMEnabled != ppmt->get_Value())) {
+        if (ppdt && ppmt && player->i___GlobalNamespace__IConnectedPlayer()->get_isConnectionOwner() && (packet->PPDEnabled != ppdt->get_Value() || packet->PPMEnabled != ppmt->get_Value())) {
             DEBUG("Player is Connection Owner, updating toogle values");
             skipUpdateHandler = true;
             ppdt->set_Value(packet->PPDEnabled);
             ppmt->set_Value(packet->PPMEnabled);
             skipUpdateHandler = false;
-        } else if (!player->get_isConnectionOwner()) {
+        } else if (!player->i___GlobalNamespace__IConnectedPlayer()->get_isConnectionOwner()) {
             WARNING("Player is not Connection Owner, ignoring packet");
         }
 
         // If a SongSpeed modifier was already set, remove it and re-announce our modifiers
         auto modifierController = _gameServerLobbyFlowCoordinator->_selectModifiersViewController->_gameplayModifiersPanelController;
-        if (player->get_isConnectionOwner() && packet->PPMEnabled && modifierController && modifierController->gameplayModifiers && 
+        if (player->i___GlobalNamespace__IConnectedPlayer()->get_isConnectionOwner() && packet->PPMEnabled && modifierController && modifierController->gameplayModifiers &&
                 modifierController->gameplayModifiers->_songSpeed != GlobalNamespace::GameplayModifiers::SongSpeed::Normal) 
         {
             // Can't just set the field, as it checks if the instance changed
@@ -267,12 +269,12 @@ namespace MultiplayerCore::UI {
 
     void MpPerPlayerUI::HandleGetMpPerPlayerPacket(Players::Packets::GetMpPerPlayerPacket* packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         // HandleGetMpPerPlayerPacket
-        DEBUG("Received GetMpPerPlayerPacket from {}|{}", player->userName, player->userId);
+        DEBUG("Received GetMpPerPlayerPacket from {}|{}", player->i___GlobalNamespace__IConnectedPlayer()->userName, player->i___GlobalNamespace__IConnectedPlayer()->userId);
         // Send MpPerPlayerPacket
         auto ppPacket = Players::Packets::MpPerPlayerPacket::New_ctor();
         ppPacket->PPDEnabled = ppdt->get_Value();
         ppPacket->PPMEnabled = ppmt->get_Value();
-        _multiplayerSessionManager->Send(ppPacket);
+        _packetSerializer->Send(ppPacket);
     }
 
     void MpPerPlayerUI::UpdateButtonsEnabled() {
@@ -284,7 +286,7 @@ namespace MultiplayerCore::UI {
         ppmt->text->alpha = isPartyOwner ? 1.0f : 0.25f;
 
         // Request updated button states from server
-        _multiplayerSessionManager->SendToPlayer(Players::Packets::GetMpPerPlayerPacket::New_ctor(), _multiplayerSessionManager->connectionOwner);
+        _packetSerializer->SendToPlayer(Players::Packets::GetMpPerPlayerPacket::New_ctor(), _multiplayerSessionManager->connectionOwner);
     }
 
     void MpPerPlayerUI::SetLobbyState(GlobalNamespace::MultiplayerLobbyState state) {
@@ -355,7 +357,7 @@ namespace MultiplayerCore::UI {
             std::shared_future fut = _beatmapLevelProvider->GetBeatmapAsync(levelHash);
             BSML::MainThreadScheduler::AwaitFuture(fut, [fut, levelHash, this](){
                 auto levelOpt = i2c::try_cast<MultiplayerCore::Beatmaps::Abstractions::MpBeatmapLevel*>(fut.get());
-                if (!levelOpt.has_value()) {
+                if (!levelOpt) {
                     ERROR("Failed to get level for hash {}", levelHash);
                     return;
                 }
@@ -378,12 +380,12 @@ namespace MultiplayerCore::UI {
                         return;
                     }
                 }
-                auto reqCharItr = level->requirements.find(_currentBeatmapKey.beatmapCharacteristic->serializedName);
+                auto reqCharItr = level->requirements.find(GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(_currentBeatmapKey.characteristic));
                 if (reqCharItr == level->requirements.end()) {
-                    ERROR("Level {} failed to get requirements for characteristic {}", levelHash, _currentBeatmapKey.beatmapCharacteristic->serializedName);
+                    ERROR("Level {} failed to get requirements for characteristic {}", levelHash, GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(_currentBeatmapKey.characteristic));
                     return;
                 }
-                DEBUG("Got level {} Requirements for characteristic {} count {}", levelHash, _currentBeatmapKey.beatmapCharacteristic->serializedName, reqCharItr->second.size());
+                DEBUG("Got level {} Requirements for characteristic {} count {}", levelHash, GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(_currentBeatmapKey.characteristic), reqCharItr->second.size());
                 // Hacky we use requirements to get the available difficulties
                 ListW<StringW> difficulties = ListW<StringW>::New(reqCharItr->second.size());
                 for (const auto& [key, value] : reqCharItr->second) {
@@ -395,11 +397,11 @@ namespace MultiplayerCore::UI {
         else
         {
             DEBUG("LevelId not custom: {}, getting difficulties from basegame", beatmapKey.levelId);
-            auto level = _beatmapLevelsModel->GetBeatmapLevel(beatmapKey.levelId);
+            auto level = _beatmapLevelsModel->GetBeatmapLevel(beatmapKey.levelId, false);
             if (level)
             {
                 // Convert our difficulties into a string list
-                auto enumerator = level->GetDifficulties(beatmapKey.beatmapCharacteristic)->GetEnumerator();
+                auto enumerator = level->GetDifficulties(beatmapKey.gameplayType, beatmapKey.characteristic)->GetEnumerator();
                 ListW<StringW> difficulties = ListW<StringW>::New();
                 while (enumerator->i___System__Collections__IEnumerator()->MoveNext())
                 {
@@ -422,7 +424,7 @@ namespace MultiplayerCore::UI {
         _allowedDifficulties->Clear();
         // Cast because cordl is missing most of the getters on the interface type
         auto upm = i2c::try_cast<GlobalNamespace::UnifiedNetworkPlayerModel*>(_gameServerLobbyFlowCoordinator->_unifiedNetworkPlayerModel);
-        if (!upm.has_value()) {
+        if (!upm) {
             ERROR("Failed to get UnifiedNetworkPlayerModel, returning...");
             return;
         }
@@ -497,7 +499,7 @@ namespace MultiplayerCore::UI {
         auto ppPacket = Players::Packets::MpPerPlayerPacket::New_ctor();
         ppPacket->PPDEnabled = value;
         if (ppmt) ppPacket->PPMEnabled = ppmt->get_Value();
-        _multiplayerSessionManager->SendToPlayer(ppPacket->i_INetSerializable(), _multiplayerSessionManager->connectionOwner);
+        _packetSerializer->SendToPlayer(ppPacket, _multiplayerSessionManager->connectionOwner);
     }
 
     bool MpPerPlayerUI::get_PerPlayerDifficulty() {
@@ -513,7 +515,7 @@ namespace MultiplayerCore::UI {
         auto ppPacket = Players::Packets::MpPerPlayerPacket::New_ctor();
         if (ppdt) ppPacket->PPDEnabled = ppdt->get_Value();
         ppPacket->PPMEnabled = value;
-        _multiplayerSessionManager->SendToPlayer(ppPacket->i_INetSerializable(), _multiplayerSessionManager->connectionOwner);
+        _packetSerializer->SendToPlayer(ppPacket, _multiplayerSessionManager->connectionOwner);
     }
 
     bool MpPerPlayerUI::get_PerPlayerModifiers() {

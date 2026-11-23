@@ -98,27 +98,3 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::G
         }
     }
 }
-
-MAKE_AUTO_HOOK_ORIG_MATCH(NetworkUtility_GetHashedUserId, &::GlobalNamespace::NetworkUtility::GetHashedUserId, StringW, StringW userId, ::GlobalNamespace::AuthenticationToken::Platform platform) {
-    // StringW prefix;
-    // if (getConfig().config.FindMember("UserIdPrefix") != getConfig().config.MemberEnd() && getConfig().config["UserIdPrefix"].IsString())
-    //     prefix = StringW(getConfig().config["UserIdPrefix"].GetString());
-
-    if (MultiplayerCore::Hooks::NetworkConfigHooks::IsOverridingAPI() && (platform == ::GlobalNamespace::AuthenticationToken::Platform::OculusQuest || platform == ::GlobalNamespace::AuthenticationToken::Platform::Oculus)) {
-        DEBUG("User is on Quest, using custom prefix");
-        DEBUG("Setting userId to hash {}", /*StringW(prefix + */StringW("OculusQuest#" + userId));
-        StringW hashedUserId = ::GlobalNamespace::NetworkUtility::GetHashBase64(/*prefix + */StringW("OculusQuest#" + userId));
-        DEBUG("Hashed userId is {}", hashedUserId);
-        return hashedUserId;
-    }
-    else if (MultiplayerCore::Hooks::NetworkConfigHooks::IsOverridingAPI() && platform.value__ == 20) {
-        DEBUG("User is on Pico, using custom prefix");
-        DEBUG("Setting userId to hash {}", /*StringW(prefix + */userId);
-        StringW hashedUserId = ::GlobalNamespace::NetworkUtility::GetHashBase64(/*prefix + */StringW("Pico#" + userId));
-        DEBUG("Hashed userId is {}", hashedUserId);
-        return hashedUserId;
-    }
-    else {
-        return NetworkUtility_GetHashedUserId(/*prefix ? prefix + userId : */userId, platform);
-    }
-}

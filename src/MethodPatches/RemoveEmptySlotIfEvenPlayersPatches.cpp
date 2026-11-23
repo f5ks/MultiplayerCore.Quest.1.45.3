@@ -5,7 +5,8 @@
 #include "GlobalNamespace/MultiplayerLobbyCenterStageManager.hpp"
 #include "GlobalNamespace/MultiplayerLobbyAvatarPlaceManager.hpp"
 #include "GlobalNamespace/MultiplayerLobbyAvatarManager.hpp"
-#include "beatsaber-hook/shared/utils/capstone-utils.hpp"
+#include "beatsaber-hook/shared/capstone.hpp"
+#include "beatsaber-hook/shared/binary.hpp"
 #include <sys/mman.h>
 
 #define __attribute                __attribute__
@@ -33,7 +34,7 @@ std::optional<uint32_t*> findIns(cs_insn* insn) {
 }
 
 bool set_ins(uint32_t* pos, uint32_t instruction) {
-    static auto il2cpp_base = baseAddr("libil2cpp.so");
+    static auto il2cpp_base = i2c::binary::base_addr("libil2cpp.so");
     if (__make_rwx(pos, sizeof(uint32_t)) == 0) {
         *pos = instruction;
         __builtin___clear_cache(reinterpret_cast<char *>(pos), reinterpret_cast<char *>(pos) + 1u);
@@ -46,14 +47,15 @@ bool set_ins(uint32_t* pos, uint32_t instruction) {
 
 // FIXME: check these patches for correctness on newer game versions!
 void Patch_MultiplayerPlayersManager_SpawnPlayers() {
-    static auto il2cpp_base = baseAddr("libil2cpp.so");
+    static auto il2cpp_base = i2c::binary::base_addr("libil2cpp.so");
 
     // patch MultiplayerPlayersManager_SpawnPlayers check to always ignore an extra player to get uneven count
-    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerPlayersManager::SpawnPlayers>::method_info();
+    using Method = i2c::metadata_getter<&::GlobalNamespace::MultiplayerPlayersManager::SpawnPlayers>;
+    auto minfo = Method::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
-    auto cset = cs::findNth<2, &findIns<ARM64_INS_CSET>, &cs::insnMatch<>, 1>(mptr);
+    auto cset = cs::find_nth<2, 1, Method::size>(mptr, &findIns<ARM64_INS_CSET>, &cs::insn_match<>);
     if (cset) {
         auto ins = *cset;
         DEBUG("Found 2nd cset @ {} (offset {:x})", fmt::ptr(ins), ((uintptr_t)ins) - il2cpp_base);
@@ -70,14 +72,15 @@ void Patch_MultiplayerPlayersManager_SpawnPlayers() {
 AUTO_INSTALL_PATCH(MultiplayerPlayersManager_SpawnPlayers);
 
 void Patch_MultiplayerLobbyCenterStageManager_RecalculateCenterPosition() {
-    static auto il2cpp_base = baseAddr("libil2cpp.so");
+    static auto il2cpp_base = i2c::binary::base_addr("libil2cpp.so");
 
     // patch MultiplayerLobbyCenterStageManager_RecalculateCenterPosition check to always ignore an extra player to get uneven count
-    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyCenterStageManager::RecalculateCenterPosition>::method_info();
+    using Method = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyCenterStageManager::RecalculateCenterPosition>;
+    auto minfo = Method::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
-    auto andIns = cs::findNth<1, &findIns<ARM64_INS_AND>, &cs::insnMatch<>, 1>(mptr);
+    auto andIns = cs::find_nth<1, 1, Method::size>(mptr, &findIns<ARM64_INS_AND>, &cs::insn_match<>);
     if (andIns) {
         auto ins = *andIns;
         DEBUG("Found 1st and @ {} (offset {:x})", fmt::ptr(ins), ((uintptr_t)ins) - il2cpp_base);
@@ -94,14 +97,15 @@ void Patch_MultiplayerLobbyCenterStageManager_RecalculateCenterPosition() {
 AUTO_INSTALL_PATCH(MultiplayerLobbyCenterStageManager_RecalculateCenterPosition);
 
 void Patch_MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces() {
-    static auto il2cpp_base = baseAddr("libil2cpp.so");
+    static auto il2cpp_base = i2c::binary::base_addr("libil2cpp.so");
 
     // patch MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces check to always ignore an extra player to get uneven count
-    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarPlaceManager::SpawnAllPlaces>::method_info();
+    using Method = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarPlaceManager::SpawnAllPlaces>;
+    auto minfo = Method::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
-    auto andIns = cs::findNth<1, &findIns<ARM64_INS_AND>, &cs::insnMatch<>, 1>(mptr);
+    auto andIns = cs::find_nth<1, 1, Method::size>(mptr, &findIns<ARM64_INS_AND>, &cs::insn_match<>);
     if (andIns) {
         auto ins = *andIns;
         DEBUG("Found 1st and @ {} (offset {:x})", fmt::ptr(ins), ((uintptr_t)ins) - il2cpp_base);
@@ -118,14 +122,15 @@ void Patch_MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces() {
 AUTO_INSTALL_PATCH(MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces);
 
 void Patch_MultiplayerLobbyAvatarManager_AddPlayer() {
-    static auto il2cpp_base = baseAddr("libil2cpp.so");
+    static auto il2cpp_base = i2c::binary::base_addr("libil2cpp.so");
 
     // patch MultiplayerLobbyAvatarManager_AddPlayer check to always ignore an extra player to get uneven count
-    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarManager::AddPlayer>::method_info();
+    using Method = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarManager::AddPlayer>;
+    auto minfo = Method::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
-    auto andIns = cs::findNth<1, &findIns<ARM64_INS_AND>, &cs::insnMatch<>, 1>(mptr);
+    auto andIns = cs::find_nth<1, 1, Method::size>(mptr, &findIns<ARM64_INS_AND>, &cs::insn_match<>);
     if (andIns) {
         auto ins = *andIns;
         DEBUG("Found 1st and @ {} (offset {:x})", fmt::ptr(ins), ((uintptr_t)ins) - il2cpp_base);

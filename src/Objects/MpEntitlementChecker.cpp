@@ -1,3 +1,5 @@
+#include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/IMultiplayerSessionManager_1.hpp"
 #include "Objects/MpEntitlementChecker.hpp"
 #include "Utils/ExtraSongData.hpp"
 #include "Utils/EnumUtils.hpp"
@@ -99,7 +101,7 @@ namespace MultiplayerCore::Objects {
             }
 
             DEBUG("Entitlement found for level {}: {}", levelId, EntitlementName(entitlement));
-            _entitlementsDictionary[_sessionManager->localPlayer->userId][levelId] = entitlement;
+            _entitlementsDictionary[_sessionManager->i___GlobalNamespace__IMultiplayerSessionManager_1___GlobalNamespace__IBeatSaberConnectedPlayer__()->localPlayer->i___GlobalNamespace__IConnectedPlayer()->userId][levelId] = entitlement;
             return entitlement;
         });
 
