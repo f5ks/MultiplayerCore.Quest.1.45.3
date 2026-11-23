@@ -34,6 +34,11 @@ add_compile_definitions(MOD_ID=\"${MOD_ID}\")
 add_compile_definitions(VERSION_LONG=0)
 add_compile_definitions(CORDL_RUNTIME_FIELD_NULL_CHECKS)
 
+option(QUEST_AUTH_TRACE "Trace Quest SDK authentication responses" OFF)
+if(QUEST_AUTH_TRACE)
+    set_source_files_properties(src/QuestAuthentication.cpp PROPERTIES COMPILE_DEFINITIONS QUEST_AUTH_TRACE)
+endif()
+
 # recursively get all src files
 file(GLOB_RECURSE cpp_file_list ${SOURCE_DIR}/*.cpp)
 file(GLOB_RECURSE c_file_list ${SOURCE_DIR}/*.c)
