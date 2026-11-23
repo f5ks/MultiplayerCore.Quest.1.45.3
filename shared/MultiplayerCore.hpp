@@ -1,12 +1,24 @@
 #pragma once
 
 #include "beatsaber-hook/shared/callback.hpp"
+#include "beatsaber-hook/shared/stringw.hpp"
 #include "./_config.h"
 #include "ServerConfig.hpp"
 #include "Models/MpStatusData.hpp"
 
+namespace GlobalNamespace { class IAuthenticationTokenProvider; }
+namespace System::Threading { struct CancellationToken; }
+
 namespace MultiplayerCore {
     struct MPCORE_EXPORT API {
+        /// @brief Return the Quest account ID from the game's authentication provider, or null if unavailable.
+        static StringW GetQuestAuthenticationUserId(GlobalNamespace::IAuthenticationTokenProvider* provider);
+
+        /// @brief Request a fresh, single-use Meta proof for the signed-in Quest account.
+        /// @return The proof, or null if the SDK fails or does not respond within 10 seconds.
+        /// @note Call from an attached worker thread. The SDK request runs on the Unity main thread.
+        static StringW RequestQuestUserProof(System::Threading::CancellationToken cancellationToken);
+
         /// @brief revert back to the official server
         static void UseOfficialServer();
 
