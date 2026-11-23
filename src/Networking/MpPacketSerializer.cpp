@@ -24,6 +24,14 @@ namespace MultiplayerCore::Networking {
         }
     }
 
+    PacketProcessedHandler* MpPacketSerializer::get_PacketProcessedHandler() {
+        return _packetProcessedHandler;
+    }
+
+    void MpPacketSerializer::set_PacketProcessedHandler(PacketProcessedHandler* value) {
+        _packetProcessedHandler = value;
+    }
+
     void MpPacketSerializer::Serialize(LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet) {
         auto packetType = reinterpret_cast<System::Object*>(packet)->GetType();
         writer->Put(packetType->NameOrDefault);
@@ -41,6 +49,9 @@ namespace MultiplayerCore::Networking {
             auto handlerItr = packetHandlers.find(packetId);
             if (handlerItr != packetHandlers.end() && handlerItr->second) {
                 handlerItr->second(reader, length, data);
+                if (_packetProcessedHandler) {
+                    _packetProcessedHandler->HandlePacketProcessed(packetId, data);
+                }
             }
         }
         catch (const std::exception& e) {

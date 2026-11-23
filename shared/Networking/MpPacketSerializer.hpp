@@ -5,6 +5,8 @@
 #include "logging.hpp"
 #endif
 
+#include "GlobalNamespace/INetworkPacketProcessor_1.hpp"
+#include "GlobalNamespace/INetworkPacketProcessedHandler_1.hpp"
 #include "GlobalNamespace/INetworkPacketSubSerializer_1.hpp"
 #include "GlobalNamespace/IBeatSaberConnectedPlayer.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
@@ -70,14 +72,27 @@ struct ::i2c::metadata_getter<static_cast<bool (GlobalNamespace::INetworkPacketS
     }
 };
 
+namespace MultiplayerCore::Networking {
+    using PacketProcessor = GlobalNamespace::INetworkPacketProcessor_1<GlobalNamespace::IBeatSaberConnectedPlayer*>;
+    using PacketProcessedHandler = GlobalNamespace::INetworkPacketProcessedHandler_1<GlobalNamespace::IBeatSaberConnectedPlayer*>;
+}
+
 DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer, System::Object,
-    GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>*, ::Zenject::IInitializable*, System::IDisposable*) {
+    GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>*, MultiplayerCore::Networking::PacketProcessor*, ::Zenject::IInitializable*, System::IDisposable*) {
         
     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
     DECLARE_OVERRIDE_METHOD_MATCH(void, Serialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
     DECLARE_OVERRIDE_METHOD_MATCH(void, Deserialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IBeatSaberConnectedPlayer* data);
     DECLARE_OVERRIDE_METHOD_MATCH(bool, HandlesType, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::HandlesType, Il2CppReflectionType* type);
+
+    DECLARE_OVERRIDE_METHOD(PacketProcessedHandler*, get_PacketProcessedHandler,
+        i2c::find_method(i2c::class_of<PacketProcessor*>(), {"get_PacketProcessedHandler", 0}));
+    DECLARE_OVERRIDE_METHOD(void, set_PacketProcessedHandler,
+        i2c::find_method(i2c::class_of<PacketProcessor*>(), {"set_PacketProcessedHandler", 1}),
+        PacketProcessedHandler* value);
+
+    DECLARE_INSTANCE_FIELD_PRIVATE(PacketProcessedHandler*, _packetProcessedHandler);
 
     static const uint8_t ID = 100u;
 
