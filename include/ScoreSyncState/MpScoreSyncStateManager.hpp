@@ -25,5 +25,5 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::ScoreSyncState, MpScoreSyncSta
     DECLARE_CTOR(ctor);
 
     public:
-        void HandleScoreSyncUpdateReceived(MpScoreSyncStatePacket* data, GlobalNamespace::IConnectedPlayer* player);
+        void HandleScoreSyncUpdateReceived(MpScoreSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player);
 };

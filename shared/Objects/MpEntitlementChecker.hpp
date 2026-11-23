@@ -1,9 +1,11 @@
 #pragma once
 
+#include "beatsaber-hook/shared/safeptr.hpp"
+#include "beatsaber-hook/shared/callback.hpp"
 #include "custom-types/shared/macros.hpp"
 #include "lapiz/shared/macros.hpp"
 #include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
-#include "GlobalNamespace/IMultiplayerSessionManager.hpp"
+#include "GlobalNamespace/IBeatSaberMultiplayerSessionManager.hpp"
 #include "GlobalNamespace/EntitlementsStatus.hpp"
 #include "System/Collections/Concurrent/ConcurrentDictionary_2.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
@@ -16,9 +18,9 @@
 using EntitlementsStatusTask = ::System::Threading::Tasks::Task_1<::GlobalNamespace::EntitlementsStatus>;
 
 DECLARE_CLASS_CODEGEN(MultiplayerCore::Objects, MpEntitlementChecker, GlobalNamespace::NetworkPlayerEntitlementChecker) {
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::IMultiplayerSessionManager*, _sessionManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::IBeatSaberMultiplayerSessionManager*, _sessionManager);
 
-    DECLARE_INJECT_METHOD(void, Inject, GlobalNamespace::IMultiplayerSessionManager* sessionManager);
+    DECLARE_INJECT_METHOD(void, Inject, GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager);
 
     DECLARE_INSTANCE_METHOD(void, Start_override);
     DECLARE_INSTANCE_METHOD(void, OnDestroy_override);
@@ -30,10 +32,10 @@ DECLARE_CLASS_CODEGEN(MultiplayerCore::Objects, MpEntitlementChecker, GlobalName
 
     DECLARE_CTOR(ctor);
     public:
-        UnorderedEventCallback<std::string, std::string, GlobalNamespace::EntitlementsStatus> receivedEntitlementEvent;
+        unordered_event_callback<std::string, std::string, GlobalNamespace::EntitlementsStatus> receivedEntitlementEvent;
 
     private:
         GlobalNamespace::EntitlementsStatus GetEntitlementStatus(std::string_view levelHash);
         std::unordered_map<std::string, std::unordered_map<std::string, GlobalNamespace::EntitlementsStatus>> _entitlementsDictionary;
-        std::unordered_map<std::string, SafePtr<EntitlementsStatusTask>> _entitlementsTasks;
+        std::unordered_map<std::string, safe_ptr<EntitlementsStatusTask*>> _entitlementsTasks;
 };

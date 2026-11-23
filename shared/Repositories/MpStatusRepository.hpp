@@ -1,4 +1,5 @@
 #pragma once
+#include "beatsaber-hook/shared/callback.hpp"
 #include "custom-types/shared/macros.hpp"
 
 #include "../Models/MpStatusData.hpp"
@@ -25,7 +26,7 @@ DECLARE_CLASS_CODEGEN(MultiplayerCore::Repositories, MpStatusRepository, System:
         static MpStatusRepository* get_Instance();
         static __declspec(property(get=get_Instance)) MpStatusRepository* Instance;
 
-        UnorderedEventCallback<std::string, const Models::MpStatusData*> statusUpdatedForUrlEvent;
+        unordered_event_callback<std::string, const Models::MpStatusData*> statusUpdatedForUrlEvent;
 
     private:
         static MpStatusRepository* _instance;

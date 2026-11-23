@@ -1,3 +1,4 @@
+#include "beatsaber-hook/shared/byref.hpp"
 #include "hooking.hpp"
 #include "logging.hpp"
 
@@ -33,7 +34,7 @@ static Beatmaps::Providers::MpBeatmapLevelProvider* _mpLevelProvider = nullptr;
 
 MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::GlobalNamespace::LobbyGameStateController::StartMultiplayerLevel, void, GlobalNamespace::LobbyGameStateController* self, GlobalNamespace::ILevelGameplaySetupData* gameplaySetupData, GlobalNamespace::IBeatmapLevelData* beatmapLevelData, System::Action* beforeSceneSwitchCallback) {
     INFO("LobbyGameStateController_StartMultiplayerLevel");
-    _mpPlayersDataModel = il2cpp_utils::try_cast<Objects::MpPlayersDataModel>(self->_lobbyPlayersDataModel).value_or(nullptr);
+    _mpPlayersDataModel = i2c::try_cast<Objects::MpPlayersDataModel*>(self->_lobbyPlayersDataModel);
     _mpLevelProvider = _mpPlayersDataModel ? _mpPlayersDataModel->_beatmapLevelProvider : _mpLevelProvider;
     static GlobalNamespace::BeatmapKey key;
     key = gameplaySetupData ? gameplaySetupData->beatmapKey : GlobalNamespace::BeatmapKey();
@@ -64,7 +65,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyGameStateController_StartMultiplayerLevel, &::Glo
             _mpLevelProvider->AddBasicBeatmapDataToLevel(beatmapLevel, key);
 
             static ConstString gameModeText = "Multiplayer";
-            self->_menuTransitionsHelper->StartMultiplayerLevel(gameModeText, byref(key), beatmapLevel, beatmapLevelData, 
+            self->_menuTransitionsHelper->StartMultiplayerLevel(gameModeText, by_ref(key), beatmapLevel, beatmapLevelData,
                 self->_playerDataModel->playerData->colorSchemesSettings->GetOverrideColorScheme(), gameplaySetupData->gameplayModifiers, 
                 self->_playerDataModel->playerData->playerSpecificSettings, nullptr, BGLib::Polyglot::Localization::Get("BUTTON_MENU"), 
                 false, 

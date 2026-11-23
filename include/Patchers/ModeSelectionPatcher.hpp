@@ -1,6 +1,7 @@
 #pragma once
 
 #include "custom-types/shared/macros.hpp"
+#include "System/Object.hpp"
 #include "GlobalNamespace/INetworkConfig.hpp"
 #include "System/IDisposable.hpp"
 

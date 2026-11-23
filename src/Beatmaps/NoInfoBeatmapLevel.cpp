@@ -8,7 +8,7 @@ DEFINE_TYPE(MultiplayerCore::Beatmaps, NoInfoBeatmapLevel);
 namespace MultiplayerCore::Beatmaps {
     void NoInfoBeatmapLevel::ctor_1(StringW hash) {
         INVOKE_CTOR();
-        INVOKE_BASE_CTOR(classof(Abstractions::MpBeatmapLevel*));
+        INVOKE_BASE_CTOR(i2c::class_of<Abstractions::MpBeatmapLevel*>());
 
         set_levelHash(static_cast<std::string>(hash));
         static ConstString Empty("");
@@ -20,8 +20,8 @@ namespace MultiplayerCore::Beatmaps {
             Empty,
             Empty,
             Empty,
-            ArrayW<StringW>::Empty(),
-            ArrayW<StringW>::Empty(),
+            ArrayW<StringW>::New(),
+            ArrayW<StringW>::New(),
             0,
             0,
             0,

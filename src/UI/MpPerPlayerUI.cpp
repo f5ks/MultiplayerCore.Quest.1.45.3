@@ -1,3 +1,5 @@
+#include "beatsaber-hook/shared/byref.hpp"
+#include "beatsaber-hook/shared/listw.hpp"
 #include "UI/MpPerPlayerUI.hpp"
 #include "Hooks/NetworkConfigHooks.hpp"
 #include "Beatmaps/Abstractions/MpBeatmapLevel.hpp"
@@ -6,7 +8,7 @@
 
 #include "GlobalNamespace/LobbySetupViewController.hpp"
 #include "GlobalNamespace/ILobbyGameStateController.hpp"
-#include "GlobalNamespace/IMultiplayerSessionManager.hpp"
+#include "GlobalNamespace/IBeatSaberMultiplayerSessionManager.hpp"
 #include "GlobalNamespace/MultiplayerLobbyState.hpp"
 #include "GlobalNamespace/LevelSelectionFlowCoordinator.hpp"
 #include "GlobalNamespace/MultiplayerLevelSelectionFlowCoordinator.hpp"
@@ -55,7 +57,7 @@ namespace MultiplayerCore::UI {
     void MpPerPlayerUI::ctor(
             GlobalNamespace::GameServerLobbyFlowCoordinator* gameServerLobbyFlowCoordinator,
             GlobalNamespace::BeatmapLevelsModel* beatmapLevelsModel,
-            GlobalNamespace::IMultiplayerSessionManager* sessionManager,
+            GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager,
             MultiplayerCore::Beatmaps::Providers::MpBeatmapLevelProvider* beatmapLevelProvider,
             MultiplayerCore::Objects::MpPlayersDataModel* playersDataModel,
             MultiplayerCore::Networking::MpPacketSerializer* packetSerializer,
@@ -66,12 +68,12 @@ namespace MultiplayerCore::UI {
         _lobbyViewController = gameServerLobbyFlowCoordinator->_lobbySetupViewController;
         _gameStateController = gameServerLobbyFlowCoordinator->_lobbyGameStateController;
         _beatmapLevelsModel = beatmapLevelsModel;
-        auto sessManOpt = il2cpp_utils::try_cast<GlobalNamespace::MultiplayerSessionManager>(sessionManager);
+        auto sessManOpt = i2c::try_cast<GlobalNamespace::BeatSaberMultiplayerSessionManager*>(sessionManager);
         if (!sessManOpt.has_value()) {
-            CRITICAL("Failed to cast IMultiplayerSessionManager to MultiplayerSessionManager, throwing runtime_error...");
-            throw std::runtime_error("Failed to cast IMultiplayerSessionManager to MultiplayerSessionManager");
+            CRITICAL("Failed to cast IBeatSaberMultiplayerSessionManager to BeatSaberMultiplayerSessionManager, throwing runtime_error...");
+            throw std::runtime_error("Failed to cast IBeatSaberMultiplayerSessionManager to BeatSaberMultiplayerSessionManager");
         }
-        _multiplayerSessionManager = sessManOpt.value();
+        _multiplayerSessionManager = sessManOpt;
         _beatmapLevelProvider = beatmapLevelProvider;
         _playersDataModel = playersDataModel;
         _packetSerializer = packetSerializer;
@@ -160,10 +162,10 @@ namespace MultiplayerCore::UI {
         else
         {
             // Update Difficulty List
-            auto lobbyPlayersDataModel = il2cpp_utils::try_cast<GlobalNamespace::LobbyPlayersDataModel>(_gameServerLobbyFlowCoordinator->_lobbyPlayersDataModel);
+            auto lobbyPlayersDataModel = i2c::try_cast<GlobalNamespace::LobbyPlayersDataModel*>(_gameServerLobbyFlowCoordinator->_lobbyPlayersDataModel);
             if (lobbyPlayersDataModel) {
                 bool _;
-                GlobalNamespace::LobbyPlayerData* playerData = lobbyPlayersDataModel.value()->GetOrCreateLobbyPlayerDataModel(lobbyPlayersDataModel.value()->localUserId, byref(_));
+                GlobalNamespace::LobbyPlayerData* playerData = lobbyPlayersDataModel->GetOrCreateLobbyPlayerDataModel(lobbyPlayersDataModel->localUserId, by_ref(_));
                 if (playerData) {
                     UpdateDifficultyListWithBeatmapKey(playerData->beatmapKey);
                 }
@@ -226,7 +228,7 @@ namespace MultiplayerCore::UI {
     // }
 
 
-    void MpPerPlayerUI::HandleMpPerPlayerPacket(Players::Packets::MpPerPlayerPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+    void MpPerPlayerUI::HandleMpPerPlayerPacket(Players::Packets::MpPerPlayerPacket* packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         // HandleMpPerPlayerPacket
         DEBUG("Received MpPerPlayerPacket from {}|{} with values PPDEnabled: {} PPMEnabled: {}", player->userName, player->userId, packet->PPDEnabled, packet->PPMEnabled);
         
@@ -263,7 +265,7 @@ namespace MultiplayerCore::UI {
         
     }
 
-    void MpPerPlayerUI::HandleGetMpPerPlayerPacket(Players::Packets::GetMpPerPlayerPacket* packet, GlobalNamespace::IConnectedPlayer* player) {
+    void MpPerPlayerUI::HandleGetMpPerPlayerPacket(Players::Packets::GetMpPerPlayerPacket* packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         // HandleGetMpPerPlayerPacket
         DEBUG("Received GetMpPerPlayerPacket from {}|{}", player->userName, player->userId);
         // Send MpPerPlayerPacket
@@ -352,19 +354,19 @@ namespace MultiplayerCore::UI {
             DEBUG("Level is custom, trying to get beatmap for hash {}", levelHash);
             std::shared_future fut = _beatmapLevelProvider->GetBeatmapAsync(levelHash);
             BSML::MainThreadScheduler::AwaitFuture(fut, [fut, levelHash, this](){
-                auto levelOpt = il2cpp_utils::try_cast<MultiplayerCore::Beatmaps::Abstractions::MpBeatmapLevel>(fut.get());
+                auto levelOpt = i2c::try_cast<MultiplayerCore::Beatmaps::Abstractions::MpBeatmapLevel*>(fut.get());
                 if (!levelOpt.has_value()) {
                     ERROR("Failed to get level for hash {}", levelHash);
                     return;
                 }
 
-                auto level = levelOpt.value();
+                auto level = levelOpt;
                 if (level->requirements.empty()) {
                     ERROR("Level {} has empty requirements, this should not happen, falling back to packet", levelHash);
                     // Fallback to getting packet
                     auto packet = _playersDataModel->FindLevelPacket(levelHash);
                     if (packet) {
-                        level = il2cpp_utils::try_cast<MultiplayerCore::Beatmaps::Abstractions::MpBeatmapLevel>(_beatmapLevelProvider->GetBeatmapFromPacket(packet)).value_or(nullptr);
+                        level = i2c::try_cast<MultiplayerCore::Beatmaps::Abstractions::MpBeatmapLevel*>(_beatmapLevelProvider->GetBeatmapFromPacket(packet));
                     }
                     if (!level) {
                         ERROR("Failed to get level from packet for hash {}", levelHash);
@@ -419,12 +421,12 @@ namespace MultiplayerCore::UI {
 
         _allowedDifficulties->Clear();
         // Cast because cordl is missing most of the getters on the interface type
-        auto upm = il2cpp_utils::try_cast<GlobalNamespace::UnifiedNetworkPlayerModel>(_gameServerLobbyFlowCoordinator->_unifiedNetworkPlayerModel);
+        auto upm = i2c::try_cast<GlobalNamespace::UnifiedNetworkPlayerModel*>(_gameServerLobbyFlowCoordinator->_unifiedNetworkPlayerModel);
         if (!upm.has_value()) {
             ERROR("Failed to get UnifiedNetworkPlayerModel, returning...");
             return;
         }
-        auto diffMask = upm.value()->selectionMask.difficulties;
+        auto diffMask = upm->selectionMask.difficulties;
         for (auto& diff : difficulties) {
             // DEBUG("Checking if difficulty {} is in selection mask", diff);
             if (GlobalNamespace::BeatmapDifficultyMaskExtensions::Contains(diffMask, Utils::EnumUtils::GetEnumValue<GlobalNamespace::BeatmapDifficulty>(diff))) {

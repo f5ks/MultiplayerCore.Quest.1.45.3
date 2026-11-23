@@ -5,7 +5,7 @@ DEFINE_TYPE(MultiplayerCore::ScoreSyncState, MpScoreSyncStateManager);
 namespace MultiplayerCore::ScoreSyncState {
     void MpScoreSyncStateManager::ctor() {
         INVOKE_CTOR();
-        INVOKE_BASE_CTOR(classof(GlobalNamespace::ScoreSyncStateManager*));
+        INVOKE_BASE_CTOR(i2c::class_of<GlobalNamespace::ScoreSyncStateManager*>());
         deltaUpdateFrequencyMs = 10;
         fullStateUpdateFrequencyMs = 100;
     }
@@ -24,7 +24,7 @@ namespace MultiplayerCore::ScoreSyncState {
         _packetSerializer->UnregisterCallback<MpScoreSyncStatePacket*>();
     }
 
-    void MpScoreSyncStateManager::HandleScoreSyncUpdateReceived(MpScoreSyncStatePacket* data, GlobalNamespace::IConnectedPlayer* player) {
+    void MpScoreSyncStateManager::HandleScoreSyncUpdateReceived(MpScoreSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         if (player->get_isConnectionOwner()) {
             DEBUG("Updating score sync frequency to following values: delta: {}ms, full: {}ms", data->deltaUpdateFrequencyMs, data->fullStateUpdateFrequencyMs);
             bool shouldForceUpdate = deltaUpdateFrequencyMs != data->deltaUpdateFrequencyMs || fullStateUpdateFrequencyMs != data->fullStateUpdateFrequencyMs;

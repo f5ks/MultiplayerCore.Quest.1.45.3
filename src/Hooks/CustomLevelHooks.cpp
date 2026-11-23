@@ -1,5 +1,7 @@
 #include "logging.hpp"
 #include "hooking.hpp"
+#include "GlobalNamespace/BeatmapCharacteristic.hpp"
+#include "System/String.hpp"
 #include "Hooks/NetworkConfigHooks.hpp"
 
 #include "UnityEngine/UI/Button.hpp"
@@ -48,7 +50,7 @@ MAKE_AUTO_HOOK_MATCH(
     GlobalNamespace::LevelSelectionNavigationController* self,
     GlobalNamespace::SongPackMask songPackMask,
     GlobalNamespace::BeatmapDifficultyMask allowedBeatmapDifficultyMask,
-    ArrayW<GlobalNamespace::BeatmapCharacteristicSO*> notAllowedCharacteristics,
+    ArrayW<GlobalNamespace::BeatmapCharacteristic> notAllowedCharacteristics,
     bool hidePacksIfOneOrNone,
     bool hidePracticeButton,
     StringW actionButtonText,

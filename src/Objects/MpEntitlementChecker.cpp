@@ -11,7 +11,7 @@
 #include "songcore/shared/SongLoader/RuntimeSongLoader.hpp"
 
 #include "GlobalNamespace/IMenuRpcManager.hpp"
-#include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/IBeatSaberConnectedPlayer.hpp"
 
 DEFINE_TYPE(MultiplayerCore::Objects, MpEntitlementChecker);
 
@@ -23,10 +23,10 @@ namespace RequirementUtils {
 namespace MultiplayerCore::Objects {
     void MpEntitlementChecker::ctor() {
         INVOKE_CTOR();
-        INVOKE_BASE_CTOR(classof(GlobalNamespace::NetworkPlayerEntitlementChecker*));
+        INVOKE_BASE_CTOR(i2c::class_of<GlobalNamespace::NetworkPlayerEntitlementChecker*>());
     }
 
-    void MpEntitlementChecker::Inject(GlobalNamespace::IMultiplayerSessionManager* sessionManager) {
+    void MpEntitlementChecker::Inject(GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager) {
         _sessionManager = sessionManager;
     }
 

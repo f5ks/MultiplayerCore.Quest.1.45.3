@@ -1,6 +1,8 @@
 #pragma once
 
+#include "beatsaber-hook/shared/callback.hpp"
 #include "custom-types/shared/macros.hpp"
+#include "System/Object.hpp"
 #include "lapiz/shared/macros.hpp"
 #include "bsml/shared/macros.hpp"
 
@@ -24,7 +26,7 @@ DECLARE_CLASS_CODEGEN(MultiplayerCore::UI, MpColorsUI, System::Object) {
     DECLARE_CTOR(ctor, GlobalNamespace::LobbySetupViewController* lobbySetupViewController);
 
     public:
-        UnorderedEventCallback<> dismissedEvent;
+        unordered_event_callback<> dismissedEvent;
 
         void ShowColors();
         void Parse();

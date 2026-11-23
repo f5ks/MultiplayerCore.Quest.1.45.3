@@ -6,7 +6,7 @@
 #include "tasks.hpp"
 #include "Utilities.hpp"
 
-#include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/IBeatSaberConnectedPlayer.hpp"
 #include "GlobalNamespace/BeatmapCharacteristicSO.hpp"
 #include "GlobalNamespace/BeatmapLevelsModel.hpp"
 #include "System/Threading/CancellationTokenSource.hpp"
@@ -18,7 +18,7 @@
 DEFINE_TYPE(MultiplayerCore::Objects, MpLevelLoader);
 
 namespace MultiplayerCore::Objects {
-    void MpLevelLoader::ctor(SongCore::SongLoader::RuntimeSongLoader* runtimeSongLoader, SongCore::Capabilities* capabilities, GlobalNamespace::IMultiplayerSessionManager* sessionManager, MpLevelDownloader* levelDownloader, GlobalNamespace::NetworkPlayerEntitlementChecker* entitlementChecker, GlobalNamespace::IMenuRpcManager* rpcManager) {
+    void MpLevelLoader::ctor(SongCore::SongLoader::RuntimeSongLoader* runtimeSongLoader, SongCore::Capabilities* capabilities, GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager, MpLevelDownloader* levelDownloader, GlobalNamespace::NetworkPlayerEntitlementChecker* entitlementChecker, GlobalNamespace::IMenuRpcManager* rpcManager) {
         INVOKE_CTOR();
         GlobalNamespace::MultiplayerLevelLoader::_ctor();
 
@@ -26,7 +26,7 @@ namespace MultiplayerCore::Objects {
         _capabilities = capabilities;
         _sessionManager = sessionManager;
         _levelDownloader = levelDownloader;
-        _entitlementChecker = il2cpp_utils::try_cast<MpEntitlementChecker>(entitlementChecker).value_or(nullptr);
+        _entitlementChecker = i2c::try_cast<MpEntitlementChecker*>(entitlementChecker);
         _rpcManager = rpcManager;
     }
 

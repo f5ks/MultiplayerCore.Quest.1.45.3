@@ -16,7 +16,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(
     &GlobalNamespace::GameServerPlayerTableCell::SetData,
     void,
     GlobalNamespace::GameServerPlayerTableCell* self,
-    GlobalNamespace::IConnectedPlayer* connectedPlayer,
+    GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer,
     GlobalNamespace::ILobbyPlayerData* playerData,
     bool hasKickPermissions,
     bool allowSelection,

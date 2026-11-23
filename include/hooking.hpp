@@ -1,7 +1,8 @@
 #pragma once
 
-#include "beatsaber-hook/shared/utils/hooking.hpp"
-#include "beatsaber-hook/shared/utils/logging.hpp"
+#include "scotland2/shared/loader.hpp"
+#include "beatsaber-hook/shared/hooking.hpp"
+#include "paper2_scotland2/shared/logger.hpp"
 #include <vector>
 
 namespace MultiplayerCore {
@@ -19,18 +20,6 @@ namespace MultiplayerCore {
         }
     };
 
-    template<auto mPtr>
-    concept has_metadata = requires() {
-        { ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo() } -> std::same_as<MethodInfo const*>;
-    };
-
-    template<auto mPtr>
-    requires(has_metadata<mPtr>)
-    using Metadata = ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>;
-
-    /// @brief checks whether the function is match hookable, which requires the function to be at least 5 (5 * 4 = 20 bytes) instructions and not have an address of 0 (abstract/virtual funcs)
-    template<auto mPtr>
-    concept match_hookable = has_metadata<mPtr> && Metadata<mPtr>::size >= (0x5 * sizeof(int32_t)) && Metadata<mPtr>::addrs != 0x0;
 }
 
 #define AUTO_INSTALL_PATCH(name_) \
@@ -45,7 +34,7 @@ namespace MultiplayerCore {
     struct Auto_Hook_##name_ {                                                                              \
         static void Auto_Hook_##name_##_Install() {                                                         \
             static constexpr auto logger = Paper::ConstLoggerContext(MOD_ID "_Install_" #name_);            \
-            ::Hooking::InstallOrigHook<Hook_##name_>(logger);                                               \
+            ::i2c::install_hook_orig<Hook_##name_>(logger);                                               \
         }                                                                                                   \
         Auto_Hook_##name_() { ::MultiplayerCore::Hooking::AddInstallFunc(Auto_Hook_##name_##_Install); }    \
     };                                                                                                      \
@@ -55,7 +44,7 @@ namespace MultiplayerCore {
     struct Auto_Hook_##name_ {                                                                              \
         static void Auto_Hook_##name_##_Install() {                                                         \
             static constexpr auto logger = Paper::ConstLoggerContext(MOD_ID "_Install_" #name_);            \
-            ::Hooking::InstallHook<Hook_##name_>(logger);                                                   \
+            ::i2c::install_hook<Hook_##name_>(logger);                                                   \
         }                                                                                                   \
         Auto_Hook_##name_() { ::MultiplayerCore::Hooking::AddInstallFunc(Auto_Hook_##name_##_Install); }    \
     };                                                                                                      \
@@ -64,14 +53,18 @@ namespace MultiplayerCore {
 #define MAKE_AUTO_HOOK_MATCH(name_, mPtr, retval, ...)                                                                                              \
     struct Hook_##name_                                                                                                                             \
     {                                                                                                                                               \
-        using funcType = retval (*)(__VA_ARGS__);                                                                                                   \
-        static_assert(MultiplayerCore::match_hookable<mPtr>);                                                                                       \
-        static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
+        using func_t = retval (*)(__VA_ARGS__);                                                                                                   \
+        static constexpr auto cast_test = []<typename Method>() { return requires { static_cast<Method>(mPtr); }; }; \
+        using method_t = typename ::i2c::detail::method_check<cast_test, func_t>::type; \
+        static_assert(cast_test.operator()<method_t>(), "Hook method signature does not match!"); \
+        static_assert(::i2c::detail::match_hookable<static_cast<method_t>(mPtr)>, "Method cannot be hooked!"); \
         constexpr static const char* name() { return #name_; }                                                                                      \
-        static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); }                        \
-        static funcType* trampoline() { return &name_; }                                                                                            \
+        static const MethodInfo* addr() { return ::i2c::metadata_getter<static_cast<method_t>(mPtr)>::method_info(); }                        \
+        static inline flamingo::HookHandle install_handle; \
+        static inline flamingo::HookPriority install_priority; \
+        static func_t* trampoline() { return &name_; }                                                                                            \
         static inline retval (*name_)(__VA_ARGS__) = nullptr;                                                                                       \
-        static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; }                                           \
+        static func_t hook() { return &hook_##name_; }                                           \
         static retval hook_##name_(__VA_ARGS__);                                                                                                    \
     };                                                                                                                                              \
     HOOK_AUTO_INSTALL(name_);                                                                                                                       \
@@ -80,11 +73,13 @@ namespace MultiplayerCore {
 #define MAKE_AUTO_HOOK_FIND_VERBOSE(name_, infoGet, retval, ...)                                            \
     struct Hook_##name_ {                                                                                   \
         constexpr static const char* name() { return #name_; }                                              \
-        static const MethodInfo* getInfo() { return infoGet; }                                              \
-        using funcType = retval (*)(__VA_ARGS__);                                                           \
-        static funcType* trampoline() { return &name_; }                                                    \
+        static const MethodInfo* addr() { return infoGet; }                                              \
+        using func_t = retval (*)(__VA_ARGS__);                                                           \
+        static inline flamingo::HookHandle install_handle; \
+        static inline flamingo::HookPriority install_priority; \
+        static func_t* trampoline() { return &name_; }                                                    \
         static inline retval (*name_)(__VA_ARGS__) = nullptr;                                               \
-        static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; }   \
+        static func_t hook() { return &hook_##name_; }   \
         static retval hook_##name_(__VA_ARGS__);                                                            \
     };                                                                                                      \
     HOOK_AUTO_INSTALL_ORIG(name_);                                                                          \
@@ -93,14 +88,18 @@ namespace MultiplayerCore {
 #define MAKE_AUTO_HOOK_ORIG_MATCH(name_, mPtr, retval, ...)                                                                                         \
     struct Hook_##name_                                                                                                                             \
     {                                                                                                                                               \
-        using funcType = retval (*)(__VA_ARGS__);                                                                                                   \
-        static_assert(MultiplayerCore::match_hookable<mPtr>);                                                                                       \
-        static_assert(std::is_same_v<funcType, ::Hooking::InternalMethodCheck<decltype(mPtr)>::funcType>, "Hook method signature does not match!"); \
+        using func_t = retval (*)(__VA_ARGS__);                                                                                                   \
+        static constexpr auto cast_test = []<typename Method>() { return requires { static_cast<Method>(mPtr); }; }; \
+        using method_t = typename ::i2c::detail::method_check<cast_test, func_t>::type; \
+        static_assert(cast_test.operator()<method_t>(), "Hook method signature does not match!"); \
+        static_assert(::i2c::detail::match_hookable<static_cast<method_t>(mPtr)>, "Method cannot be hooked!"); \
         constexpr static const char* name() { return #name_; }                                                                                      \
-        static const MethodInfo* getInfo() { return ::il2cpp_utils::il2cpp_type_check::MetadataGetter<mPtr>::methodInfo(); }                        \
-        static funcType* trampoline() { return &name_; }                                                                                            \
+        static const MethodInfo* addr() { return ::i2c::metadata_getter<static_cast<method_t>(mPtr)>::method_info(); }                        \
+        static inline flamingo::HookHandle install_handle; \
+        static inline flamingo::HookPriority install_priority; \
+        static func_t* trampoline() { return &name_; }                                                                                            \
         static inline retval (*name_)(__VA_ARGS__) = nullptr;                                                                                       \
-        static funcType hook() { return &::Hooking::HookCatchWrapper<&hook_##name_, funcType>::wrapper; }                                           \
+        static func_t hook() { return &hook_##name_; }                                           \
         static retval hook_##name_(__VA_ARGS__);                                                                                                    \
     };                                                                                                                                              \
     HOOK_AUTO_INSTALL_ORIG(name_);                                                                                                                  \

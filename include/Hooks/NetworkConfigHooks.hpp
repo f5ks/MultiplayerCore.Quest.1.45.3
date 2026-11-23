@@ -1,5 +1,6 @@
 #pragma once
 
+#include "beatsaber-hook/shared/callback.hpp"
 #include "MultiplayerCore.hpp"
 
 #include "GlobalNamespace/DnsEndPoint.hpp"
@@ -7,13 +8,13 @@
 #include <string>
 #include <optional>
 
-struct Hook_MainSystemInit_Init;
+struct Hook_MainSettingsAsyncLoader_LoadInternalAsync;
 
 namespace MultiplayerCore::Hooks {
     struct NetworkConfigHooks {
         public:
             /// @brief Event for when the server changes
-            static UnorderedEventCallback<const ServerConfig*> ServerChanged;
+            static unordered_event_callback<const ServerConfig*> ServerChanged;
 
             /// @brief Use a custom API server
             /// @param graphUrl the graph url
@@ -44,7 +45,7 @@ namespace MultiplayerCore::Hooks {
             // /// @brief If set: disable SSL and certificate validation for all Ignorance/ENet client connections.
             // static bool DisableSsl;
 
-            friend struct ::Hook_MainSystemInit_Init;
+            friend struct ::Hook_MainSettingsAsyncLoader_LoadInternalAsync;
 
             static ServerConfig officialServerConfig;
             static const ServerConfig* currentServerConfig;

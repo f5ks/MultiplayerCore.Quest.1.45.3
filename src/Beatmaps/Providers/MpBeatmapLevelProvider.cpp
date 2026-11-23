@@ -1,16 +1,18 @@
+#include "beatsaber-hook/shared/threading.hpp"
+#include "beatsaber-hook/shared/byref.hpp"
 #include "Beatmaps/Providers/MpBeatmapLevelProvider.hpp"
 #include "Beatmaps/NetworkBeatmapLevel.hpp"
 #include "Beatmaps/LocalBeatmapLevel.hpp"
 #include "Beatmaps/BeatSaverBeatmapLevel.hpp"
 #include "Beatmaps/BeatSaverPreviewMediaData.hpp"
 
-#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/members.hpp"
 #include "songcore/shared/SongCore.hpp"
 #include "beatsaverplusplus/shared/BeatSaver.hpp"
 
 #include "GlobalNamespace/EnvironmentName.hpp"
 #include "GlobalNamespace/BeatmapBasicData.hpp"
-#include "System/ValueTuple_2.hpp"
+#include "System/ValueTuple_3.hpp"
 
 #include "Utilities.hpp"
 #include "logging.hpp"
@@ -31,12 +33,12 @@ namespace MultiplayerCore::Beatmaps::Providers {
     }
 
     std::future<GlobalNamespace::BeatmapLevel*> MpBeatmapLevelProvider::GetBeatmapFromBeatSaverAsync(const std::string& levelHash) {
-        return il2cpp_utils::il2cpp_async(std::launch::async, std::bind(&MpBeatmapLevelProvider::GetBeatmapFromBeatSaver, this, levelHash));
+        return il2cpp_async(std::launch::async, std::bind(&MpBeatmapLevelProvider::GetBeatmapFromBeatSaver, this, levelHash));
     }
 
     GlobalNamespace::BeatmapLevel* MpBeatmapLevelProvider::GetBeatmapFromBeatSaver(std::string levelHash) {
         GlobalNamespace::BeatmapLevel* level = nullptr;
-        if (_hashToBeatsaverLevels->TryGetValue(levelHash, byref(level))) {
+        if (_hashToBeatsaverLevels->TryGetValue(levelHash, by_ref(level))) {
             return level;
         }
 
@@ -84,7 +86,7 @@ namespace MultiplayerCore::Beatmaps::Providers {
     GlobalNamespace::BeatmapLevel* MpBeatmapLevelProvider::GetBeatmapFromPacket(Packets::MpBeatmapPacket* packet) {
         // cache network levels
         GlobalNamespace::BeatmapLevel* level = nullptr;
-        if (_hashToNetworkLevels->TryGetValue(packet->levelHash, byref(level))) {
+        if (_hashToNetworkLevels->TryGetValue(packet->levelHash, by_ref(level))) {
             return level;
         }
 
@@ -95,23 +97,24 @@ namespace MultiplayerCore::Beatmaps::Providers {
 
     GlobalNamespace::BeatmapLevel* MpBeatmapLevelProvider::TryGetBeatmapFromPacketHash(std::string levelHash) {
         GlobalNamespace::BeatmapLevel* level = nullptr;
-        if (_hashToNetworkLevels->TryGetValue(levelHash, byref(level))) {
+        if (_hashToNetworkLevels->TryGetValue(levelHash, by_ref(level))) {
             return level;
         }
         return nullptr;
     }
 
     GlobalNamespace::BeatmapLevel* MpBeatmapLevelProvider::AddBasicBeatmapDataToLevel(GlobalNamespace::BeatmapLevel* level, GlobalNamespace::BeatmapKey& beatmapKey, Packets::MpBeatmapPacket* packet) {
-        using BasicDataDict = System::Collections::Generic::Dictionary_2<System::ValueTuple_2<UnityW<GlobalNamespace::BeatmapCharacteristicSO>, GlobalNamespace::BeatmapDifficulty>, GlobalNamespace::BeatmapBasicData*>;
-        BasicDataDict* dict = reinterpret_cast<BasicDataDict*>(level->beatmapBasicData);
+        using BasicDataDict = System::Collections::Generic::Dictionary_2<System::ValueTuple_3<GlobalNamespace::GameplayType, GlobalNamespace::BeatmapCharacteristic, GlobalNamespace::BeatmapDifficulty>, GlobalNamespace::BeatmapBasicData*>;
+        BasicDataDict* dict = level->_gameplayTypeBeatmapBasicDatas;
 
         if (!dict) {
             dict = BasicDataDict::New_ctor();
-            level->____beatmapBasicDatas = dict;
+            level->_gameplayTypeBeatmapBasicDatas = dict;
         }
 
-        auto key = System::ValueTuple_2<UnityW<GlobalNamespace::BeatmapCharacteristicSO>, GlobalNamespace::BeatmapDifficulty>(
-            beatmapKey.beatmapCharacteristic,
+        auto key = System::ValueTuple_3<GlobalNamespace::GameplayType, GlobalNamespace::BeatmapCharacteristic, GlobalNamespace::BeatmapDifficulty>(
+            beatmapKey.gameplayType,
+            beatmapKey.characteristic,
             beatmapKey.difficulty
         );
 
@@ -128,7 +131,7 @@ namespace MultiplayerCore::Beatmaps::Providers {
             );
         }
 
-        level->____beatmapBasicDatas = dict;
+        level->_gameplayTypeBeatmapBasicDatas = dict;
         return level;
     }
 }

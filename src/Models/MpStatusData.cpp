@@ -1,7 +1,7 @@
 #include "Models/MpStatusData.hpp"
 
 #include "logging.hpp"
-#include "beatsaber-hook/shared/config/rapidjson-utils.hpp"
+#include "beatsaber-hook/shared/rapidjson.hpp"
 
 #include "GlobalNamespace/MultiplayerStatusData.hpp"
 
@@ -111,9 +111,9 @@ namespace MultiplayerCore::Models {
 
         // simple get from json into values
         GET(status, status);
-        GET(maintenanceStartTime, maintenanceStartTime);
-        GET(maintenanceEndTime, maintenanceEndTime);
-        GET(useGamelift, useGamelift);
+        GET(maintenance_start_time, maintenance_start_time);
+        GET(maintenance_end_time, maintenance_end_time);
+        GET(use_gamelift, use_gamelift);
         GET(use_ssl, _useSsl);
         GET(name, _name);
         GET(description, _description);

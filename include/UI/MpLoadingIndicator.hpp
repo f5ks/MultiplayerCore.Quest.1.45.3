@@ -5,7 +5,7 @@
 
 #include "Objects/MpEntitlementChecker.hpp"
 #include "Objects/MpLevelLoader.hpp"
-#include "GlobalNamespace/IMultiplayerSessionManager.hpp"
+#include "GlobalNamespace/IBeatSaberMultiplayerSessionManager.hpp"
 #include "GlobalNamespace/ILobbyGameStateController.hpp"
 #include "GlobalNamespace/ILobbyPlayersDataModel.hpp"
 #include "GlobalNamespace/NetworkPlayerEntitlementChecker.hpp"
@@ -22,7 +22,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::UI, MpLoadingIndicator, System
     DECLARE_INSTANCE_FIELD_PRIVATE(double, _downloadProgress);
     DECLARE_INSTANCE_FIELD_PRIVATE(bool, _isDownloading);
     DECLARE_INSTANCE_FIELD_PRIVATE(UnityEngine::GameObject*, vert);
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::IMultiplayerSessionManager*, _sessionManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::IBeatSaberMultiplayerSessionManager*, _sessionManager);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ILobbyGameStateController*, _gameStateController);
     DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::ILobbyPlayersDataModel*, _playersDataModel);
     DECLARE_INSTANCE_FIELD_PRIVATE(Objects::MpEntitlementChecker*, _entitlementChecker);
@@ -36,7 +36,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::UI, MpLoadingIndicator, System
     DECLARE_INSTANCE_METHOD(void, Report, double value);
 
     DECLARE_CTOR(ctor,
-        GlobalNamespace::IMultiplayerSessionManager* sessionManager,
+        GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager,
         GlobalNamespace::ILobbyGameStateController* gameStateController,
         GlobalNamespace::ILobbyPlayersDataModel* playersDataModel,
         GlobalNamespace::NetworkPlayerEntitlementChecker* entitlementChecker,

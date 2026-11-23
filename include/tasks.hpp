@@ -1,6 +1,7 @@
 #pragma once
 
-#include "beatsaber-hook/shared/utils/il2cpp-utils.hpp"
+#include "beatsaber-hook/shared/safeptr.hpp"
+#include "beatsaber-hook/shared/threading.hpp"
 #include "System/Threading/Tasks/Task_1.hpp"
 #include <chrono>
 #include <thread>
@@ -21,7 +22,7 @@ namespace MultiplayerCore {
     static void task_cancel_func(Task<Ret>* task, T&& func, CancellationToken&& cancelToken) {
         using namespace std::chrono_literals;
         // start func as an std::future
-        auto fut = il2cpp_utils::il2cpp_async(std::forward<T>(func), std::forward<CancellationToken>(cancelToken));
+        auto fut = il2cpp_async(std::forward<T>(func), std::forward<CancellationToken>(cancelToken));
         // await the future
         while (fut.wait_for(0ns) != std::future_status::ready && !cancelToken.IsCancellationRequested) std::this_thread::yield();
 
@@ -37,14 +38,14 @@ namespace MultiplayerCore {
     requires(!std::is_same_v<Ret, void> && std::is_invocable_r_v<Ret, T>)
     static Task<Ret>* StartTask(T&& func) {
         auto t = Task<Ret>::New_ctor();
-        il2cpp_utils::il2cpp_aware_thread(&task_func<Ret, T>, t, std::forward<T>(func)).detach();
+        il2cpp_thread(&task_func<Ret, T>, t, std::forward<T>(func)).detach();
         return t;
     }
 
     template<typename Ret, typename T>
     requires(!std::is_same_v<Ret, void> && std::is_invocable_r_v<Ret, T>)
-    static SafePtr<Task<Ret>> StartSafePtrThread(T&& func) {
-        auto t = SafePtr<Task<Ret>>(Task<Ret>::New_ctor());
+    static safe_ptr<Task<Ret>*> StartSafePtrThread(T&& func) {
+        auto t = safe_ptr<Task<Ret>*>(Task<Ret>::New_ctor());
         std::thread(&task_func<Ret, T>, t, std::forward<T>(func)).detach();
         return t;
     }
@@ -62,14 +63,14 @@ namespace MultiplayerCore {
     requires(!std::is_same_v<Ret, void> && std::is_invocable_r_v<Ret, T, CancellationToken>)
     static Task<Ret>* StartTask(T&& func, CancellationToken&& cancelToken) {
         auto t = Task<Ret>::New_ctor();
-        il2cpp_utils::il2cpp_aware_thread(&task_cancel_func<Ret, T>, t, std::forward<T>(func), std::forward<CancellationToken>(cancelToken)).detach();
+        il2cpp_thread(&task_cancel_func<Ret, T>, t, std::forward<T>(func), std::forward<CancellationToken>(cancelToken)).detach();
         return t;
     }
 
     template<typename Ret, typename T>
     requires(!std::is_same_v<Ret, void> && std::is_invocable_r_v<Ret, T, CancellationToken>)
-    static SafePtr<Task<Ret>> StartSafePtrThread(T&& func, CancellationToken&& cancelToken) {
-        auto t = SafePtr<Task<Ret>>(Task<Ret>::New_ctor());
+    static safe_ptr<Task<Ret>*> StartSafePtrThread(T&& func, CancellationToken&& cancelToken) {
+        auto t = safe_ptr<Task<Ret>*>(Task<Ret>::New_ctor());
         std::thread(&task_cancel_func<Ret, T>, t, std::forward<T>(func), std::forward<CancellationToken>(cancelToken)).detach();
         return t;
     }

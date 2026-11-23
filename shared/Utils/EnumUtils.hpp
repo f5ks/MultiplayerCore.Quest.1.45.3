@@ -1,55 +1,32 @@
 #pragma once
 
+#include "System/Array.hpp"
+#include "System/String.hpp"
+#include "System/StringComparison.hpp"
 #include "System/Type.hpp"
-#include "System/Enum.hpp"
+#include "beatsaber-hook/shared/members.hpp"
 #include <string>
 
 namespace MultiplayerCore::Utils {
     struct EnumUtils {
         template <class T>
-        static StringW GetEnumName(T value)
-        {
-            auto enumType = (System::Type*)csTypeOf(T);
-            return enumType->GetEnumName((System::Object*)il2cpp_functions::value_box(classof(T), &value));
+        static StringW GetEnumName(T value) {
+            auto enumType = static_cast<System::Type*>(i2c::cs_type_of<T>());
+            return enumType->GetEnumName(reinterpret_cast<System::Object*>(
+                i2c::functions::value_box(i2c::class_of<T>(), &value)));
         }
 
-        template<typename T>
-        static T GetEnumValue(const std::string& enumName) {
-            return EnumUtils::GetEnumValue<T>(enumName, false);
-        }
-
-        template<typename T>
-        static T GetEnumValue(const std::string& enumName, bool ignoreCase) {
-            StringW value = enumName;
-            T enumResult = T(0);
-            try {
-                static auto* ___internal__method = THROW_UNLESS((::il2cpp_utils::FindMethod("System", "Enum", "TryParse", std::vector<Il2CppClass*>{::il2cpp_utils::il2cpp_type_check::il2cpp_no_arg_class<T>::get()}, ::std::vector<const Il2CppType*>{::il2cpp_utils::ExtractType(value), ::il2cpp_utils::ExtractType(ignoreCase), ::il2cpp_utils::ExtractIndependentType<T&>()})));
-                static auto* ___generic__method = THROW_UNLESS(::il2cpp_utils::MakeGenericMethod(___internal__method, std::vector<Il2CppClass*>{::il2cpp_utils::il2cpp_type_check::il2cpp_no_arg_class<T>::get()}));
-                ::il2cpp_utils::RunMethodRethrow<bool, false>(static_cast<System::Object*>(nullptr), ___generic__method, value, ignoreCase, byref(enumResult));
-
-                // Il2CppClass* enumClass = classof(T);
-                // Il2CppReflectionType* enumType = enumClass ? ::il2cpp_utils::GetSystemType(enumClass) : nullptr;
-                // if (enumType != nullptr) {
-                //     // static bool TryParseEnum(::System::Type* enumType, ::StringW value, bool ignoreCase, ByRef<::System::Enum::EnumResult> parseResult);
-                //     System::Enum::EnumResult parseResult;
-                //     if (System::Enum::TryParseEnum(enumType, enumName, ignoreCase, byref(parseResult))) {
-                //         if (parseResult.parsedEnum) enumValue = *reinterpret_cast<T*>(il2cpp_functions::object_unbox(parseResult.parsedEnum));
-                //     }
-                //     // enumValue = static_cast<T>(System::Enum::Parse(enumType, enumName));
-                // }
-            } catch (il2cpp_utils::exceptions::StackTraceException const& e) {
-                // TODO: logging
-                // getMpCoreLogger().error("REPORT TO ENDER StackTraceException: %s", e.what());
-                // e.log_backtrace();
-            } catch (il2cpp_utils::RunMethodException const& e) {
-                // getMpCoreLogger().error("REPORT TO ENDER RunMethodException: %s", e.what());
-                // e.log_backtrace();
-            } catch (const std::runtime_error& e) {
-                // getMpCoreLogger().error("REPORT TO ENDER runtime_error: %s", e.what());
-            } catch (...) {
-                // getMpCoreLogger().error("REPORT TO ENDER: Unknown exception");
+        template <class T>
+        static T GetEnumValue(const std::string& name, bool ignoreCase = false) {
+            auto enumType = static_cast<System::Type*>(i2c::cs_type_of<T>());
+            auto names = enumType->GetEnumNames();
+            auto comparison = ignoreCase ? System::StringComparison::OrdinalIgnoreCase : System::StringComparison::Ordinal;
+            for (std::size_t index = 0; index < names.size(); ++index) {
+                if (!System::String::Equals(names[index], name, comparison)) continue;
+                auto value = enumType->GetEnumValues()->GetValue(static_cast<int>(index));
+                return *static_cast<T*>(i2c::functions::object_unbox(reinterpret_cast<Il2CppObject*>(value)));
             }
-            return enumResult;
+            return T(0);
         }
     };
 }

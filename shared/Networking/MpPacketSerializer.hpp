@@ -6,7 +6,7 @@
 #endif
 
 #include "GlobalNamespace/INetworkPacketSubSerializer_1.hpp"
-#include "GlobalNamespace/IConnectedPlayer.hpp"
+#include "GlobalNamespace/IBeatSaberConnectedPlayer.hpp"
 #include "LiteNetLib/Utils/NetDataWriter.hpp"
 #include "LiteNetLib/Utils/NetDataReader.hpp"
 #include "LiteNetLib/Utils/INetSerializable.hpp"
@@ -16,7 +16,7 @@
 #include "System/Type.hpp"
 #include "Zenject/IInitializable.hpp"
 
-#include "GlobalNamespace/MultiplayerSessionManager.hpp"
+#include "GlobalNamespace/BeatSaberMultiplayerSessionManager.hpp"
 #include "GlobalNamespace/ThreadStaticPacketPool_1.hpp"
 
 #include <type_traits>
@@ -36,57 +36,57 @@ namespace MultiplayerCore {
     };
 }
 
-using PacketHandler = std::function<void (LiteNetLib::Utils::NetDataReader*, int, GlobalNamespace::IConnectedPlayer*)>;
+using PacketHandler = std::function<void (LiteNetLib::Utils::NetDataReader*, int, GlobalNamespace::IBeatSaberConnectedPlayer*)>;
 
 template<>
-struct ::il2cpp_utils::il2cpp_type_check::MetadataGetter<static_cast<void (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::*)(LiteNetLib::Utils::NetDataWriter*, LiteNetLib::Utils::INetSerializable*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::Serialize)> {
-    static const MethodInfo* methodInfo() {
-        static auto klass = classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>*);
-        static auto* writer = &classof(LiteNetLib::Utils::NetDataWriter*)->byval_arg;
-        static auto* packet = &classof(LiteNetLib::Utils::INetSerializable*)->byval_arg;
-        return ::il2cpp_utils::FindMethod(klass, "Serialize", std::vector<Il2CppClass*>(), ::std::vector<const Il2CppType*>{writer, packet});
+struct ::i2c::metadata_getter<static_cast<void (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::*)(LiteNetLib::Utils::NetDataWriter*, LiteNetLib::Utils::INetSerializable*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::Serialize)> {
+    static const MethodInfo* method_info() {
+        static auto klass = i2c::class_of<GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>*>();
+        static auto* writer = &i2c::class_of<LiteNetLib::Utils::NetDataWriter*>()->byval_arg;
+        static auto* packet = &i2c::class_of<LiteNetLib::Utils::INetSerializable*>()->byval_arg;
+        return i2c::find_method(klass, {"Serialize", {}, {writer, packet}});
     }
 };
 
 template<>
-struct ::il2cpp_utils::il2cpp_type_check::MetadataGetter<static_cast<void (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::*)(LiteNetLib::Utils::NetDataReader*, int, GlobalNamespace::IConnectedPlayer*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::Deserialize)> {
-    static const MethodInfo* methodInfo() {
-        static auto klass = classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>*);
-        static auto* reader = &classof(LiteNetLib::Utils::NetDataReader*)->byval_arg;
-        static auto* length = &classof(int)->byval_arg;
-        static auto* data = &classof(GlobalNamespace::IConnectedPlayer*)->byval_arg;
+struct ::i2c::metadata_getter<static_cast<void (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::*)(LiteNetLib::Utils::NetDataReader*, int, GlobalNamespace::IBeatSaberConnectedPlayer*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::Deserialize)> {
+    static const MethodInfo* method_info() {
+        static auto klass = i2c::class_of<GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>*>();
+        static auto* reader = &i2c::class_of<LiteNetLib::Utils::NetDataReader*>()->byval_arg;
+        static auto* length = &i2c::class_of<int>()->byval_arg;
+        static auto* data = &i2c::class_of<GlobalNamespace::IBeatSaberConnectedPlayer*>()->byval_arg;
 
-        return ::il2cpp_utils::FindMethod(klass, "Deserialize", std::vector<Il2CppClass*>(), ::std::vector<const Il2CppType*>{reader, length, data});
+        return i2c::find_method(klass, {"Deserialize", {}, {reader, length, data}});
     }
 };
 
 template<>
-struct ::il2cpp_utils::il2cpp_type_check::MetadataGetter<static_cast<bool (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::*)(System::Type*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>::HandlesType)> {
-    static const MethodInfo* methodInfo() {
-        static auto klass = classof(GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer *>*);
-        static auto* type = &classof(System::Type*)->byval_arg;
+struct ::i2c::metadata_getter<static_cast<bool (GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::*)(System::Type*)>(&GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>::HandlesType)> {
+    static const MethodInfo* method_info() {
+        static auto klass = i2c::class_of<GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer *>*>();
+        static auto* type = &i2c::class_of<System::Type*>()->byval_arg;
 
-        return ::il2cpp_utils::FindMethod(klass, "HandlesType", std::vector<Il2CppClass*>(), ::std::vector<const Il2CppType*>{type});
+        return i2c::find_method(klass, {"HandlesType", {}, {type}});
     }
 };
 
 DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer, System::Object,
-    GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*, ::Zenject::IInitializable*, System::IDisposable*) {
+    GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>*, ::Zenject::IInitializable*, System::IDisposable*) {
         
     DECLARE_OVERRIDE_METHOD_MATCH(void, Initialize, &::Zenject::IInitializable::Initialize);
     DECLARE_OVERRIDE_METHOD_MATCH(void, Dispose, &::System::IDisposable::Dispose);
-    DECLARE_OVERRIDE_METHOD_MATCH(void, Serialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>::Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
-    DECLARE_OVERRIDE_METHOD_MATCH(void, Deserialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>::Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IConnectedPlayer* data);
-    DECLARE_OVERRIDE_METHOD_MATCH(bool, HandlesType, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>::HandlesType, Il2CppReflectionType* type);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Serialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::Serialize, LiteNetLib::Utils::NetDataWriter* writer, LiteNetLib::Utils::INetSerializable* packet);
+    DECLARE_OVERRIDE_METHOD_MATCH(void, Deserialize, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::Deserialize, LiteNetLib::Utils::NetDataReader* reader, int length, GlobalNamespace::IBeatSaberConnectedPlayer* data);
+    DECLARE_OVERRIDE_METHOD_MATCH(bool, HandlesType, &GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>::HandlesType, Il2CppReflectionType* type);
 
     static const uint8_t ID = 100u;
 
-    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::MultiplayerSessionManager*, _sessionManager);
+    DECLARE_INSTANCE_FIELD_PRIVATE(GlobalNamespace::BeatSaberMultiplayerSessionManager*, _sessionManager);
 
-    DECLARE_CTOR(ctor, GlobalNamespace::IMultiplayerSessionManager* sessionManager);
+    DECLARE_CTOR(ctor, GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager);
 
     public:
-        GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>* i_INetworkPacketSubSerializer_1_IConnectedPlayer() { return reinterpret_cast<GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IConnectedPlayer*>*>(this); }
+        GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>* i_INetworkPacketSubSerializer_1_IConnectedPlayer() { return reinterpret_cast<GlobalNamespace::INetworkPacketSubSerializer_1<GlobalNamespace::IBeatSaberConnectedPlayer*>*>(this); }
         Zenject::IInitializable* i_IInitializable() { return reinterpret_cast<::Zenject::IInitializable*>(this); }
         System::IDisposable* i_IDisposable() { return reinterpret_cast<::System::IDisposable*>(this); }
 
@@ -99,7 +99,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket> && !::MultiplayerCore::IPoolablePacket<TPacket>)
         static TPacket ObtainPacket() {
-            return il2cpp_utils::NewSpecific<TPacket>();
+            return i2c::new_ctor<TPacket>();
         }
 
         template<::MultiplayerCore::INetSerializable TPacket>
@@ -114,31 +114,31 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
 
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
-        void RegisterCallback(std::function<void(TPacket)> callback) { RegisterCallback([callback](TPacket packet, GlobalNamespace::IConnectedPlayer* player){ callback(packet); }); }
+        void RegisterCallback(std::function<void(TPacket)> callback) { RegisterCallback([callback](TPacket packet, GlobalNamespace::IBeatSaberConnectedPlayer* player){ callback(packet); }); }
 
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
-        void RegisterCallback(std::function<void(TPacket, GlobalNamespace::IConnectedPlayer*)> callback) {
-            System::Type* packetType = csTypeOf(TPacket);
+        void RegisterCallback(std::function<void(TPacket, GlobalNamespace::IBeatSaberConnectedPlayer*)> callback) {
+            System::Type* packetType = i2c::cs_type_of<TPacket>();
             registeredTypes.emplace_back(reinterpret_cast<Il2CppReflectionType*>(packetType));
             std::string packetId(packetType->NameOrDefault);
 
-            packetHandlers[packetId] = [callback](LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player){
+            packetHandlers[packetId] = [callback](LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IBeatSaberConnectedPlayer* player){
                 callback(DeserializePacket<TPacket>(reader, size), player);
             };
         }
 
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
-        void RegisterCallback(const std::string& packetId, std::function<void(TPacket)> callback) { RegisterCallback(packetId, [callback](TPacket packet, GlobalNamespace::IConnectedPlayer* player){ callback(packet); }); }
+        void RegisterCallback(const std::string& packetId, std::function<void(TPacket)> callback) { RegisterCallback(packetId, [callback](TPacket packet, GlobalNamespace::IBeatSaberConnectedPlayer* player){ callback(packet); }); }
 
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
-        void RegisterCallback(const std::string& packetId, std::function<void(TPacket, GlobalNamespace::IConnectedPlayer*)> callback) {
-            Il2CppReflectionType* packetType = csTypeOf(TPacket);
+        void RegisterCallback(const std::string& packetId, std::function<void(TPacket, GlobalNamespace::IBeatSaberConnectedPlayer*)> callback) {
+            Il2CppReflectionType* packetType = i2c::cs_type_of<TPacket>();
             registeredTypes.emplace_back(reinterpret_cast<Il2CppReflectionType*>(packetType));
 
-            packetHandlers[packetId] = [callback](LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IConnectedPlayer* player){
+            packetHandlers[packetId] = [callback](LiteNetLib::Utils::NetDataReader* reader, int size, GlobalNamespace::IBeatSaberConnectedPlayer* player){
                 callback(DeserializePacket<TPacket>(reader, size), player);
             };
         }
@@ -146,7 +146,7 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
         void UnregisterCallback() {
-            System::Type* packetType = csTypeOf(TPacket);
+            System::Type* packetType = i2c::cs_type_of<TPacket>();
             std::string packetId(packetType->NameOrDefault);
 
             std::erase(registeredTypes, reinterpret_cast<Il2CppReflectionType*>(packetType));
@@ -156,8 +156,8 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
         /// <summary>
         /// Obtains the connection owner / the player representing the dedicated server
         /// </summary>
-        GlobalNamespace::IConnectedPlayer* get_connectionOwner();
-        __declspec(property(get = get_connectionOwner))::GlobalNamespace::IConnectedPlayer* connectionOwner;
+        GlobalNamespace::IBeatSaberConnectedPlayer* get_connectionOwner();
+        __declspec(property(get = get_connectionOwner))::GlobalNamespace::IBeatSaberConnectedPlayer* connectionOwner;
 
         /// <summary>
         /// Sends a packet to the server / connection owner
@@ -173,10 +173,10 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking, MpPacketSerializer
 
         template<::MultiplayerCore::INetSerializable TPacket>
         requires(std::is_pointer_v<TPacket>)
-        void SendToPlayer(TPacket packet, GlobalNamespace::IConnectedPlayer* player) {
+        void SendToPlayer(TPacket packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
             /* TODO: try catch, logging? */
             if (_sessionManager) {
-                _sessionManager->SendToPlayer(packet->i_INetSerializable(), player);
+                _sessionManager->SendToPlayer(packet->i_INetSerializable(), player->i___GlobalNamespace__IConnectedPlayer());
             }
         }
 

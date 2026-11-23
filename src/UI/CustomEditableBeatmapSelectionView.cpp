@@ -1,3 +1,4 @@
+#include "beatsaber-hook/shared/byref.hpp"
 #include "UI/CustomEditableBeatmapSelectionView.hpp"
 #include "Beatmaps/Packets/MpBeatmapPacket.hpp"
 #include "Beatmaps/Providers/MpBeatmapLevelProvider.hpp"
@@ -16,9 +17,9 @@ namespace MultiplayerCore::UI {
         _mpBeatmapLevelProvider = mpBeatmapLevelProvider;
     }
 
-    void CustomEditableBeatmapSelectionView::SetBeatmap(ByRef<GlobalNamespace::BeatmapKey> beatmapKey) {
-        static auto method = il2cpp_utils::il2cpp_type_check::MetadataGetter<&GlobalNamespace::EditableBeatmapSelectionView::SetBeatmap>::methodInfo();
-        static auto base = [](GlobalNamespace::EditableBeatmapSelectionView* self, ByRef<GlobalNamespace::BeatmapKey> beatmapKey){ return il2cpp_utils::RunMethodRethrow<void, false>(self, method, beatmapKey); };
+    void CustomEditableBeatmapSelectionView::SetBeatmap(by_ref<GlobalNamespace::BeatmapKey> beatmapKey) {
+        static auto method = i2c::metadata_getter<&GlobalNamespace::EditableBeatmapSelectionView::SetBeatmap>::method_info();
+        static auto base = [](GlobalNamespace::EditableBeatmapSelectionView* self, by_ref<GlobalNamespace::BeatmapKey> beatmapKey){ return i2c::run_method<void>(self, method, beatmapKey); };
         if (!beatmapKey->IsValid()) {
             DEBUG("beatmapkey was invalid");
             return base(this, beatmapKey);
@@ -30,7 +31,7 @@ namespace MultiplayerCore::UI {
             return base(this, beatmapKey);
         }
 
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine(beatmapKey.heldRef, levelHash)));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine((*beatmapKey), levelHash)));
     }
 
     custom_types::Helpers::Coroutine CustomEditableBeatmapSelectionView::SetBeatmapCoroutine(GlobalNamespace::BeatmapKey beatmapKey, std::string levelHash) {

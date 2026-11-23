@@ -25,5 +25,5 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::NodePoseSyncState, MpNodePoseS
     DECLARE_CTOR(ctor);
 
     public:
-        void HandleNodePoseSyncUpdateReceived(MpNodePoseSyncStatePacket* data, GlobalNamespace::IConnectedPlayer* player);
+        void HandleNodePoseSyncUpdateReceived(MpNodePoseSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player);
 };

@@ -46,7 +46,7 @@ namespace MultiplayerCore::Beatmaps {
                     
                     auto coverOpt = v->GetCoverImage();
                     if (coverOpt.has_value()) {
-                        auto coverBytes = ArrayW(coverOpt.value());
+                        auto coverBytes = ArrayW<uint8_t>(coverOpt.value());
                         
                         std::atomic<bool> done = false;
                         // TODO: Maybe use safeptr or something to make sure it can't get GC'd

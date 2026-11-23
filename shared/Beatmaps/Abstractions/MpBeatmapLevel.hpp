@@ -4,6 +4,7 @@
 #include "DifficultyColors.hpp"
 #include "../../Utils/ExtraSongData.hpp"
 
+#include "GlobalNamespace/BeatmapLevel.hpp"
 #include "GlobalNamespace/EnvironmentInfoSO.hpp"
 #include "UnityEngine/Sprite.hpp"
 #include "System/Collections/Generic/IReadOnlyList_1.hpp"
@@ -19,7 +20,7 @@ DECLARE_CLASS_CODEGEN(MultiplayerCore::Beatmaps::Abstractions, MpBeatmapLevel, G
     public:
         std::unordered_map<std::string, std::unordered_map<uint32_t, std::list<std::string>>> requirements;
         std::unordered_map<std::string, std::unordered_map<uint32_t, DifficultyColors>> difficultyColors;
-        std::vector<const MultiplayerCore::Utils::ExtraSongData::Contributor> contributors;
+        std::vector<MultiplayerCore::Utils::ExtraSongData::Contributor> contributors;
     protected:
         std::string _levelHash;
         void set_levelHash(std::string_view levelHash) { _levelHash = levelHash; }

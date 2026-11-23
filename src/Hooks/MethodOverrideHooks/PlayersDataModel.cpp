@@ -1,3 +1,4 @@
+#include "beatsaber-hook/shared/byref.hpp"
 #include "hooking.hpp"
 #include "logging.hpp"
 #include "InvokingLock.hpp"
@@ -17,7 +18,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_Activate, &::GlobalNamespace::Lo
     if (!lock) {
         LobbyPlayersDataModel_Activate(self);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
             reinterpret_cast<MpPlayersDataModel*>(self)->Activate_override();
         else
@@ -30,7 +31,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_Deactivate, &::GlobalNamespace::
     if (!lock) {
         LobbyPlayersDataModel_Deactivate(self);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
             reinterpret_cast<MpPlayersDataModel*>(self)->Deactivate_override();
         else
@@ -38,12 +39,12 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_Deactivate, &::GlobalNamespace::
     }
 }
 // override HandleMultiplayerSessionManagerPlayerConnected
-MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected, &::GlobalNamespace::LobbyPlayersDataModel::HandleMultiplayerSessionManagerPlayerConnected, void, GlobalNamespace::LobbyPlayersDataModel* self, GlobalNamespace::IConnectedPlayer* connectedPlayer) {
+MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected, &::GlobalNamespace::LobbyPlayersDataModel::HandleMultiplayerSessionManagerPlayerConnected, void, GlobalNamespace::LobbyPlayersDataModel* self, GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer) {
     INVOKE_LOCK(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected);
     if (!lock) {
         LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected(self, connectedPlayer);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
             reinterpret_cast<MpPlayersDataModel*>(self)->HandlePlayerConnected(connectedPlayer);
         else
@@ -57,7 +58,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMenuRpcManagerGetRecommend
     if (!lock) {
         LobbyPlayersDataModel_HandleMenuRpcManagerGetRecommendedBeatmap(self, userId);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
             reinterpret_cast<MpPlayersDataModel*>(self)->HandleMenuRpcManagerGetRecommendedBeatmap_override(userId);
         else
@@ -70,7 +71,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMenuRpcManagerRecommendBea
     if (!lock) {
         LobbyPlayersDataModel_HandleMenuRpcManagerRecommendBeatmap(self, userId, beatmapKey);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
             reinterpret_cast<MpPlayersDataModel*>(self)->HandleMenuRpcManagerRecommendBeatmap_override(userId, beatmapKey);
         else
@@ -78,17 +79,17 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMenuRpcManagerRecommendBea
     }
 }
 // override SetLocalPlayerBeatmapLevel
-MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::GlobalNamespace::LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, GlobalNamespace::LobbyPlayersDataModel* self, ByRef<GlobalNamespace::BeatmapKey> key) {
+MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::GlobalNamespace::LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, GlobalNamespace::LobbyPlayersDataModel* self, by_ref<GlobalNamespace::BeatmapKey> key) {
     INVOKE_LOCK(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel);
     if (!lock) {
         DEBUG("LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel not locked, calling original");
         LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel(self, key);
     } else {
-        static auto customKlass = classof(MpPlayersDataModel*);
+        static auto customKlass = i2c::class_of<MpPlayersDataModel*>();
         if (self->klass == customKlass)
         {
             DEBUG("LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel locked customKlass, calling override");
-            reinterpret_cast<MpPlayersDataModel*>(self)->SetLocalPlayerBeatmapLevel_override(key.heldRef);
+            reinterpret_cast<MpPlayersDataModel*>(self)->SetLocalPlayerBeatmapLevel_override((*key));
         }
         else
         {

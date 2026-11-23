@@ -49,7 +49,7 @@ void Patch_MultiplayerPlayersManager_SpawnPlayers() {
     static auto il2cpp_base = baseAddr("libil2cpp.so");
 
     // patch MultiplayerPlayersManager_SpawnPlayers check to always ignore an extra player to get uneven count
-    auto minfo = il2cpp_utils::il2cpp_type_check::MetadataGetter<&::GlobalNamespace::MultiplayerPlayersManager::SpawnPlayers>::methodInfo();
+    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerPlayersManager::SpawnPlayers>::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
@@ -73,7 +73,7 @@ void Patch_MultiplayerLobbyCenterStageManager_RecalculateCenterPosition() {
     static auto il2cpp_base = baseAddr("libil2cpp.so");
 
     // patch MultiplayerLobbyCenterStageManager_RecalculateCenterPosition check to always ignore an extra player to get uneven count
-    auto minfo = il2cpp_utils::il2cpp_type_check::MetadataGetter<&::GlobalNamespace::MultiplayerLobbyCenterStageManager::RecalculateCenterPosition>::methodInfo();
+    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyCenterStageManager::RecalculateCenterPosition>::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
@@ -97,7 +97,7 @@ void Patch_MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces() {
     static auto il2cpp_base = baseAddr("libil2cpp.so");
 
     // patch MultiplayerLobbyAvatarPlaceManager_SpawnAllPlaces check to always ignore an extra player to get uneven count
-    auto minfo = il2cpp_utils::il2cpp_type_check::MetadataGetter<&::GlobalNamespace::MultiplayerLobbyAvatarPlaceManager::SpawnAllPlaces>::methodInfo();
+    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarPlaceManager::SpawnAllPlaces>::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);
@@ -121,7 +121,7 @@ void Patch_MultiplayerLobbyAvatarManager_AddPlayer() {
     static auto il2cpp_base = baseAddr("libil2cpp.so");
 
     // patch MultiplayerLobbyAvatarManager_AddPlayer check to always ignore an extra player to get uneven count
-    auto minfo = il2cpp_utils::il2cpp_type_check::MetadataGetter<&::GlobalNamespace::MultiplayerLobbyAvatarManager::AddPlayer>::methodInfo();
+    auto minfo = i2c::metadata_getter<&::GlobalNamespace::MultiplayerLobbyAvatarManager::AddPlayer>::method_info();
     auto mptr = (uint32_t*)minfo->methodPointer;
 
     DEBUG("Method pointer : {} (offset {:x})", fmt::ptr(mptr), ((uintptr_t)mptr) - il2cpp_base);

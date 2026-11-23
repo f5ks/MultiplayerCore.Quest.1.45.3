@@ -1,3 +1,4 @@
+#include "Hooks/NetworkConfigHooks.hpp"
 #include "Repositories/MpStatusRepository.hpp"
 #include "logging.hpp"
 
@@ -21,8 +22,10 @@ namespace MultiplayerCore::Repositories {
 
     void MpStatusRepository::ReportStatus(MultiplayerCore::Models::MpStatusData* statusData) {
         _lastStatus = statusData;
-        _statusByUrl->set_Item(_networkConfig->multiplayerStatusUrl, statusData);
-        statusUpdatedForUrlEvent.invoke(_networkConfig->multiplayerStatusUrl, statusData);
+        auto server = Hooks::NetworkConfigHooks::GetCurrentServer();
+        if (!server) return;
+        _statusByUrl->set_Item(server->masterServerStatusUrl, statusData);
+        statusUpdatedForUrlEvent.invoke(server->masterServerStatusUrl, statusData);
     }
 
     MultiplayerCore::Models::MpStatusData* MpStatusRepository::GetLastStatusData() {

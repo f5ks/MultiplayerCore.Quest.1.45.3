@@ -29,5 +29,5 @@ DECLARE_CLASS_CUSTOM(MultiplayerCore::Beatmaps::Packets, MpBeatmapPacket, Multip
         static MpBeatmapPacket* New_1(GlobalNamespace::BeatmapLevel* beatmap, GlobalNamespace::BeatmapKey beatmapKey);
         std::unordered_map<uint32_t, std::list<std::string>> requirements;
         std::unordered_map<uint32_t, MultiplayerCore::Beatmaps::Abstractions::DifficultyColors> mapColors;
-        std::vector<const MultiplayerCore::Utils::ExtraSongData::Contributor> contributors;
+        std::vector<MultiplayerCore::Utils::ExtraSongData::Contributor> contributors;
 };

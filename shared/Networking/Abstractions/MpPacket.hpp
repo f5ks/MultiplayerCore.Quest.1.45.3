@@ -14,18 +14,18 @@ DECLARE_CLASS_CODEGEN_INTERFACES(MultiplayerCore::Networking::Abstractions, MpPa
         [[nodiscard]] LiteNetLib::Utils::INetSerializable* i_INetSerializable() { return reinterpret_cast<LiteNetLib::Utils::INetSerializable*>(this); }
 };
 
-#include "beatsaber-hook/shared/utils/il2cpp-utils-methods.hpp"
+#include "beatsaber-hook/shared/members.hpp"
 template<>
-struct ::il2cpp_utils::il2cpp_type_check::MetadataGetter<static_cast<void (MultiplayerCore::Networking::Abstractions::MpPacket::*)(LiteNetLib::Utils::NetDataWriter*)>(&MultiplayerCore::Networking::Abstractions::MpPacket::Serialize)> {
-    static const MethodInfo* get() {
-        static auto* writer = &::il2cpp_utils::GetClassFromName("MultiplayerCore.Networking.Abstractions", "MpPacket")->byval_arg;
-        return ::il2cpp_utils::FindMethod(classof(MultiplayerCore::Networking::Abstractions::MpPacket*), "Serialize", std::vector<Il2CppClass*>(), ::std::vector<const Il2CppType*>{writer});
+struct ::i2c::metadata_getter<static_cast<void (MultiplayerCore::Networking::Abstractions::MpPacket::*)(LiteNetLib::Utils::NetDataWriter*)>(&MultiplayerCore::Networking::Abstractions::MpPacket::Serialize)> {
+    static const MethodInfo* method_info() {
+        return i2c::find_method(i2c::class_of<MultiplayerCore::Networking::Abstractions::MpPacket*>(),
+            {"Serialize", {}, {i2c::type_of<LiteNetLib::Utils::NetDataWriter*>()}});
     }
 };
 template<>
-struct ::il2cpp_utils::il2cpp_type_check::MetadataGetter<static_cast<void (MultiplayerCore::Networking::Abstractions::MpPacket::*)(LiteNetLib::Utils::NetDataReader*)>(&MultiplayerCore::Networking::Abstractions::MpPacket::Deserialize)> {
-    static const MethodInfo* get() {
-        static auto* reader = &::il2cpp_utils::GetClassFromName("MultiplayerCore.Networking.Abstractions", "MpPacket")->byval_arg;
-        return ::il2cpp_utils::FindMethod(classof(MultiplayerCore::Networking::Abstractions::MpPacket*), "Deserialize", std::vector<Il2CppClass*>(), ::std::vector<const Il2CppType*>{reader});
+struct ::i2c::metadata_getter<static_cast<void (MultiplayerCore::Networking::Abstractions::MpPacket::*)(LiteNetLib::Utils::NetDataReader*)>(&MultiplayerCore::Networking::Abstractions::MpPacket::Deserialize)> {
+    static const MethodInfo* method_info() {
+        return i2c::find_method(i2c::class_of<MultiplayerCore::Networking::Abstractions::MpPacket*>(),
+            {"Deserialize", {}, {i2c::type_of<LiteNetLib::Utils::NetDataReader*>()}});
     }
 };

@@ -5,7 +5,7 @@ DEFINE_TYPE(MultiplayerCore::NodePoseSyncState, MpNodePoseSyncStateManager);
 namespace MultiplayerCore::NodePoseSyncState {
     void MpNodePoseSyncStateManager::ctor() {
         INVOKE_CTOR();
-        INVOKE_BASE_CTOR(classof(GlobalNamespace::NodePoseSyncStateManager*));
+        INVOKE_BASE_CTOR(i2c::class_of<GlobalNamespace::NodePoseSyncStateManager*>());
         deltaUpdateFrequencyMs = 10L;
         fullStateUpdateFrequencyMs = 100L;
     }
@@ -24,7 +24,7 @@ namespace MultiplayerCore::NodePoseSyncState {
         _packetSerializer->UnregisterCallback<MpNodePoseSyncStatePacket*>();
     }
 
-    void MpNodePoseSyncStateManager::HandleNodePoseSyncUpdateReceived(MpNodePoseSyncStatePacket* data, GlobalNamespace::IConnectedPlayer* player) {
+    void MpNodePoseSyncStateManager::HandleNodePoseSyncUpdateReceived(MpNodePoseSyncStatePacket* data, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         if (player->get_isConnectionOwner()) {
             DEBUG("Updating node pose sync frequency to following values: delta: {}ms, full: {}ms", data->deltaUpdateFrequencyMs, data->fullStateUpdateFrequencyMs);
             bool shouldForceUpdate = deltaUpdateFrequencyMs != data->deltaUpdateFrequencyMs || fullStateUpdateFrequencyMs != data->fullStateUpdateFrequencyMs;

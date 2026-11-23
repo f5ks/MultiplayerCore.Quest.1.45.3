@@ -1,3 +1,4 @@
+#include "beatsaber-hook/shared/listw.hpp"
 #include "UI/MpRequirementsUI.hpp"
 #include "Beatmaps/Abstractions/MpBeatmapLevel.hpp"
 #include "Beatmaps/BeatSaverBeatmapLevel.hpp"
@@ -168,7 +169,7 @@ namespace MultiplayerCore::UI {
     void MpRequirementsUI::SetRequirementsFromLevel(GlobalNamespace::BeatmapLevel* level, GlobalNamespace::BeatmapKey& beatmapKey) {
         ClearCells(_levelInfoCells);
 
-        auto customLevel = il2cpp_utils::try_cast<SongCore::SongLoader::CustomBeatmapLevel>(level).value_or(nullptr);
+        auto customLevel = i2c::try_cast<SongCore::SongLoader::CustomBeatmapLevel*>(level);
         // hacky way of being able to just break out of an "if" via break rather than a goto: label
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wswitch-bool"

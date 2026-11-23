@@ -7,7 +7,7 @@
 DEFINE_TYPE(MultiplayerCore::Players, MpPlayerManager);
 
 namespace MultiplayerCore::Players {
-    void MpPlayerManager::ctor(MultiplayerCore::Networking::MpPacketSerializer* packetSerializer, GlobalNamespace::IPlatformUserModel* platformUserModel, GlobalNamespace::IMultiplayerSessionManager* sessionManager) {
+    void MpPlayerManager::ctor(MultiplayerCore::Networking::MpPacketSerializer* packetSerializer, GlobalNamespace::IPlatformUserModel* platformUserModel, GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager) {
         INVOKE_CTOR();
 
         _playerData = ConcurrentPlayerDataDictionary::New_ctor();
@@ -25,8 +25,8 @@ namespace MultiplayerCore::Players {
             std::bind(&MpPlayerManager::HandlePlayerData, this, std::placeholders::_1, std::placeholders::_2)
         );
         // _sessionManager->add_playerConnectedEvent(
-        //     BSML::MakeSystemAction<GlobalNamespace::IConnectedPlayer*>(
-        //         std::function<void(GlobalNamespace::IConnectedPlayer*)>(
+        //     BSML::MakeSystemAction<GlobalNamespace::IBeatSaberConnectedPlayer*>(
+        //         std::function<void(GlobalNamespace::IBeatSaberConnectedPlayer*)>(
         //             std::bind(&MpPlayerManager::HandlePlayerConnected, this, std::placeholders::_1)
         //         )
         //     )
@@ -46,7 +46,7 @@ namespace MultiplayerCore::Players {
         _packetSerializer->UnregisterCallback<MpPlayerData*>();
     }
 
-    void MpPlayerManager::HandlePlayerConnected(GlobalNamespace::IConnectedPlayer* player) {
+    void MpPlayerManager::HandlePlayerConnected(GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         if (!_localPlayerInfo) throw std::runtime_error("local player info was not yet set! make sure it is set before anything else happens!");
 
         auto packet = MpPlayerData::New_ctor();
@@ -66,7 +66,7 @@ namespace MultiplayerCore::Players {
         _packetSerializer->Send(packet);
     }
 
-    void MpPlayerManager::HandlePlayerData(MpPlayerData* packet, GlobalNamespace::IConnectedPlayer* player) {
+    void MpPlayerManager::HandlePlayerData(MpPlayerData* packet, GlobalNamespace::IBeatSaberConnectedPlayer* player) {
         _playerData->set_Item(player->get_userId(), packet);
         PlayerConnectedEvent.invoke(player, packet);
     }

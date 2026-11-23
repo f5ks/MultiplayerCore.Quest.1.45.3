@@ -27,7 +27,7 @@ int ILobbyPlayersDataModel_Count(GlobalNamespace::ILobbyPlayersDataModel* model)
 
 namespace MultiplayerCore::UI {
     void MpLoadingIndicator::ctor(
-        GlobalNamespace::IMultiplayerSessionManager* sessionManager,
+        GlobalNamespace::IBeatSaberMultiplayerSessionManager* sessionManager,
         GlobalNamespace::ILobbyGameStateController* gameStateController,
         GlobalNamespace::ILobbyPlayersDataModel* playersDataModel,
         GlobalNamespace::NetworkPlayerEntitlementChecker* entitlementChecker,
@@ -39,7 +39,7 @@ namespace MultiplayerCore::UI {
         _sessionManager = sessionManager;
         _gameStateController = gameStateController;
         _playersDataModel = playersDataModel;
-        _entitlementChecker = il2cpp_utils::try_cast<Objects::MpEntitlementChecker>(entitlementChecker).value_or(nullptr);
+        _entitlementChecker = i2c::try_cast<Objects::MpEntitlementChecker*>(entitlementChecker);
         _levelLoader = levelLoader;
         _screenController = screenController;
     }
