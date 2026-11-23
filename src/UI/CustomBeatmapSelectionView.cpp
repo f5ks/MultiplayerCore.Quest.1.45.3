@@ -1,3 +1,4 @@
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
 #include "beatsaber-hook/shared/byref.hpp"
 #include "UI/CustomBeatmapSelectionView.hpp"
 #include "Beatmaps/Packets/MpBeatmapPacket.hpp"
@@ -17,11 +18,12 @@ namespace MultiplayerCore::UI {
         _mpBeatmapLevelProvider = mpBeatmapLevelProvider;
     }
 
-    void CustomBeatmapSelectionView::SetBeatmap(by_ref<GlobalNamespace::BeatmapKey> beatmapKey) {
+    void CustomBeatmapSelectionView::SetBeatmap(by_ref<const GlobalNamespace::BeatmapKey> beatmapKey) {
         static auto method = i2c::metadata_getter<&GlobalNamespace::BeatmapSelectionView::SetBeatmap>::method_info();
-        static auto base = [](GlobalNamespace::BeatmapSelectionView* self, by_ref<GlobalNamespace::BeatmapKey> beatmapKey){ return i2c::run_method<void>(self, method, beatmapKey); };
-        if (!beatmapKey->IsValid()) {
-            WARNING("beatmapkey was invalid, {} {} {}", beatmapKey->levelId, (int)beatmapKey->difficulty, beatmapKey->beatmapCharacteristic ? beatmapKey->beatmapCharacteristic->get_serializedName() : "null");
+        static auto base = [](GlobalNamespace::BeatmapSelectionView* self, by_ref<const GlobalNamespace::BeatmapKey> beatmapKey){ return i2c::run_method<void>(self, method, beatmapKey); };
+        auto key = *beatmapKey;
+        if (!key.IsValid()) {
+            WARNING("beatmapkey was invalid, {} {} {}", beatmapKey->levelId, (int)beatmapKey->difficulty, GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(beatmapKey->characteristic));
             return base(this, beatmapKey);
         }
 
@@ -31,7 +33,7 @@ namespace MultiplayerCore::UI {
             return base(this, beatmapKey);
         }
 
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine((*beatmapKey), levelHash)));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine(key, levelHash)));
     }
 
     custom_types::Helpers::Coroutine CustomBeatmapSelectionView::SetBeatmapCoroutine(GlobalNamespace::BeatmapKey beatmapKey, std::string levelHash) {
@@ -59,7 +61,7 @@ namespace MultiplayerCore::UI {
 
         level = _mpBeatmapLevelProvider->AddBasicBeatmapDataToLevel(level, beatmapKey, packet);
 
-        _levelBar->Setup(level, beatmapKey.difficulty, beatmapKey.beatmapCharacteristic);
+        _levelBar->Setup(level, beatmapKey.difficulty, beatmapKey.characteristic);
         co_return;
     }
 }

@@ -1,3 +1,5 @@
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
+#include "GlobalNamespace/IMultiplayerSessionManager_1.hpp"
 #include "Objects/MpLevelLoader.hpp"
 #include "Utils/ExtraSongData.hpp"
 #include "lapiz/shared/utilities/MainThreadScheduler.hpp"
@@ -75,10 +77,12 @@ namespace MultiplayerCore::Objects {
 
         if (_loaderState == MultiplayerBeatmapLoaderState::WaitingForCountdown) {
             // if start time is greater than sync time we're still in countdown, don't try to do anything.
-            if (_startTime > _multiplayerSessionManager->syncTime) return;
+            auto session = _multiplayerSessionManager->i___GlobalNamespace__IMultiplayerSessionManager_1___GlobalNamespace__IBeatSaberConnectedPlayer__();
+            if (_startTime > session->syncTime) return;
 
             // we are past countdown, now check all players
-            auto allPlayersReady = All(_multiplayerSessionManager->connectedPlayers, [this, levelId](auto p){
+            auto allPlayersReady = All(session->connectedPlayers, [this, levelId](auto player){
+                auto p = player->i___GlobalNamespace__IConnectedPlayer();
                 return
                 _entitlementChecker->GetKnownEntitlement(p->userId, levelId) == GlobalNamespace::EntitlementsStatus::Ok || // has level
                 p->HasState("in_gameplay") || // already playing
@@ -102,7 +106,7 @@ namespace MultiplayerCore::Objects {
         GlobalNamespace::EntitlementsStatus status;
 
         if (hash.empty()) { // basegame
-            auto level = _beatmapLevelsModel->GetBeatmapLevel(levelId);
+            auto level = _beatmapLevelsModel->GetBeatmapLevel(levelId, false);
             status = level != nullptr ? GlobalNamespace::EntitlementsStatus::Ok : GlobalNamespace::EntitlementsStatus::NotOwned;
         } else { // custom
             auto level = _runtimeSongLoader->GetLevelByHash(hash);
@@ -126,7 +130,7 @@ namespace MultiplayerCore::Objects {
         if (!level || !level->standardLevelInfoSaveDataV2 || !level->standardLevelInfoSaveDataV2.value()->CustomSaveDataInfo) return;
 
         // SongCore::CustomJSONData::CustomSaveDataInfo::BasicCustomLevelDetails
-        auto diffDataOpt = level->standardLevelInfoSaveDataV2.value()->CustomSaveDataInfo->get().TryGetCharacteristicAndDifficulty(beatmapKey.beatmapCharacteristic->serializedName, beatmapKey.difficulty);
+        auto diffDataOpt = level->standardLevelInfoSaveDataV2.value()->CustomSaveDataInfo->get().TryGetCharacteristicAndDifficulty(GlobalNamespace::BeatmapCharacteristicExtensions::SerializedName(beatmapKey.characteristic), beatmapKey.difficulty);
         if (!diffDataOpt.has_value()) return;
 
         auto& diffData = diffDataOpt->get();
@@ -155,23 +159,23 @@ namespace MultiplayerCore::Objects {
                         _rpcManager->SetIsEntitledToLevel(levelId, GlobalNamespace::EntitlementsStatus::NotOwned);
                     });
                     _beatmapLevelData = nullptr;
-                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_Error();
+                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_BeatmapLevelDataNotFound();
                 }
                 auto level = _runtimeSongLoader->GetLevelByLevelID(levelId);
                 if (!level) {
                     DEBUG("Couldn't get level by id");
-                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_Error();
+                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_BeatmapLevelDataNotFound();
                 }
                 if (!level->beatmapLevelData) {
                     DEBUG("level data is null!");
-                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_Error();
+                    return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_BeatmapLevelDataNotFound();
                 }
                 DEBUG("Got level data for level {}: {}", levelId, fmt::ptr(level->beatmapLevelData));
-                return GlobalNamespace::LoadBeatmapLevelDataResult(false, level->beatmapLevelData);
+                return GlobalNamespace::LoadBeatmapLevelDataResult::Success(level->beatmapLevelData);
             } catch(std::exception const& e) {
                 ERROR("Caught error during beatmap level download: {}, what: {}", typeid(e).name(), e.what());
             }
-            return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_Error();
+            return ::GlobalNamespace::LoadBeatmapLevelDataResult::getStaticF_BeatmapLevelDataNotFound();
         }, std::forward<CancellationToken>(cancellationToken));
     }
 

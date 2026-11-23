@@ -39,7 +39,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_Deactivate, &::GlobalNamespace::
     }
 }
 // override HandleMultiplayerSessionManagerPlayerConnected
-MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected, &::GlobalNamespace::LobbyPlayersDataModel::HandleMultiplayerSessionManagerPlayerConnected, void, GlobalNamespace::LobbyPlayersDataModel* self, GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer) {
+MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected, &::GlobalNamespace::LobbyPlayersDataModel::HandleMultiplayerSessionManagerPlayerConnected, void, GlobalNamespace::LobbyPlayersDataModel* self, GlobalNamespace::IConnectedPlayer* connectedPlayer) {
     INVOKE_LOCK(LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected);
     if (!lock) {
         LobbyPlayersDataModel_HandleMultiplayerSessionManagerPlayerConnected(self, connectedPlayer);
@@ -79,7 +79,7 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_HandleMenuRpcManagerRecommendBea
     }
 }
 // override SetLocalPlayerBeatmapLevel
-MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::GlobalNamespace::LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, GlobalNamespace::LobbyPlayersDataModel* self, by_ref<GlobalNamespace::BeatmapKey> key) {
+MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::GlobalNamespace::LobbyPlayersDataModel::SetLocalPlayerBeatmapLevel, void, GlobalNamespace::LobbyPlayersDataModel* self, by_ref<const GlobalNamespace::BeatmapKey> key) {
     INVOKE_LOCK(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel);
     if (!lock) {
         DEBUG("LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel not locked, calling original");
@@ -89,7 +89,8 @@ MAKE_AUTO_HOOK_ORIG_MATCH(LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel, &::G
         if (self->klass == customKlass)
         {
             DEBUG("LobbyPlayersDataModel_SetLocalPlayerBeatmapLevel locked customKlass, calling override");
-            reinterpret_cast<MpPlayersDataModel*>(self)->SetLocalPlayerBeatmapLevel_override((*key));
+            auto beatmapKey = *key;
+            reinterpret_cast<MpPlayersDataModel*>(self)->SetLocalPlayerBeatmapLevel_override(beatmapKey);
         }
         else
         {

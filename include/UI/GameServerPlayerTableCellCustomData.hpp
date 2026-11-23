@@ -7,7 +7,7 @@
 #include "../Objects/MpPlayersDataModel.hpp"
 #include "Beatmaps/Providers/MpBeatmapLevelProvider.hpp"
 #include "GlobalNamespace/GameServerPlayerTableCell.hpp"
-#include "GlobalNamespace/IBeatSaberConnectedPlayer.hpp"
+#include "GlobalNamespace/IConnectedPlayer.hpp"
 #include "GlobalNamespace/ILobbyPlayerData.hpp"
 
 DECLARE_CLASS_CODEGEN(MultiplayerCore::UI, GameServerPlayerTableCellCustomData, UnityEngine::MonoBehaviour) {
@@ -18,8 +18,8 @@ DECLARE_CLASS_CODEGEN(MultiplayerCore::UI, GameServerPlayerTableCellCustomData, 
 
     DECLARE_INSTANCE_METHOD(void, Awake);
     public:
-        void SetData(GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask);
-        custom_types::Helpers::Coroutine SetDataCoroutine(GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask);
+        void SetData(GlobalNamespace::IConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask);
+        custom_types::Helpers::Coroutine SetDataCoroutine(GlobalNamespace::IConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask);
     private:
         void SetLevelFoundValues(bool displayLevelText);
 };

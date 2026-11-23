@@ -1,7 +1,7 @@
 #include "Beatmaps/NoInfoBeatmapLevel.hpp"
 #include "Beatmaps/BeatSaverPreviewMediaData.hpp"
 #include "System/Collections/Generic/Dictionary_2.hpp"
-#include "System/ValueTuple_2.hpp"
+#include "System/ValueTuple_3.hpp"
 
 DEFINE_TYPE(MultiplayerCore::Beatmaps, NoInfoBeatmapLevel);
 
@@ -30,7 +30,7 @@ namespace MultiplayerCore::Beatmaps {
             0,
             GlobalNamespace::PlayerSensitivityFlag::Safe,
             BeatSaverPreviewMediaData::New_ctor(hash)->i_IPreviewMediaData(),
-            System::Collections::Generic::Dictionary_2<System::ValueTuple_2<UnityW<GlobalNamespace::BeatmapCharacteristicSO>, GlobalNamespace::BeatmapDifficulty>, GlobalNamespace::BeatmapBasicData*>::New_ctor()
+            System::Collections::Generic::Dictionary_2<System::ValueTuple_3<GlobalNamespace::GameplayType, GlobalNamespace::BeatmapCharacteristic, GlobalNamespace::BeatmapDifficulty>, GlobalNamespace::BeatmapBasicData*>::New_ctor()
         );
     }
 }

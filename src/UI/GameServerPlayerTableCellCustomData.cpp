@@ -29,7 +29,7 @@ namespace MultiplayerCore::UI {
         _gameServerPlayerTableCell = GetComponent<GlobalNamespace::GameServerPlayerTableCell*>();
     }
 
-    void GameServerPlayerTableCellCustomData::SetData(GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask) {
+    void GameServerPlayerTableCellCustomData::SetData(GlobalNamespace::IConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask) {
         if (!_gameServerPlayerTableCell) return;
         _gameServerPlayerTableCell->_playerNameText->text = connectedPlayer->userName;
         if (!playerData->isReady && playerData->isActive && !playerData->isPartyOwner) {
@@ -47,7 +47,7 @@ namespace MultiplayerCore::UI {
         BSML::SharedCoroutineStarter::StartCoroutine(SetDataCoroutine(connectedPlayer, playerData, hasKickPermissions, allowSelection, getLevelEntitlementTask));
     }
 
-    custom_types::Helpers::Coroutine GameServerPlayerTableCellCustomData::SetDataCoroutine(GlobalNamespace::IBeatSaberConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask) {
+    custom_types::Helpers::Coroutine GameServerPlayerTableCellCustomData::SetDataCoroutine(GlobalNamespace::IConnectedPlayer* connectedPlayer, GlobalNamespace::ILobbyPlayerData* playerData, bool hasKickPermissions, bool allowSelection, System::Threading::Tasks::Task_1<GlobalNamespace::EntitlementStatus>* getLevelEntitlementTask) {
         auto key = playerData->i___GlobalNamespace__ILevelGameplaySetupData()->beatmapKey;
         bool validKey = key.IsValid();
         bool displayLevelText = validKey;

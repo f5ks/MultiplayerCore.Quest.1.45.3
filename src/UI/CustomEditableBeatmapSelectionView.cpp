@@ -1,3 +1,4 @@
+#include "GlobalNamespace/BeatmapCharacteristicExtensions.hpp"
 #include "beatsaber-hook/shared/byref.hpp"
 #include "UI/CustomEditableBeatmapSelectionView.hpp"
 #include "Beatmaps/Packets/MpBeatmapPacket.hpp"
@@ -17,10 +18,11 @@ namespace MultiplayerCore::UI {
         _mpBeatmapLevelProvider = mpBeatmapLevelProvider;
     }
 
-    void CustomEditableBeatmapSelectionView::SetBeatmap(by_ref<GlobalNamespace::BeatmapKey> beatmapKey) {
+    void CustomEditableBeatmapSelectionView::SetBeatmap(by_ref<const GlobalNamespace::BeatmapKey> beatmapKey) {
         static auto method = i2c::metadata_getter<&GlobalNamespace::EditableBeatmapSelectionView::SetBeatmap>::method_info();
-        static auto base = [](GlobalNamespace::EditableBeatmapSelectionView* self, by_ref<GlobalNamespace::BeatmapKey> beatmapKey){ return i2c::run_method<void>(self, method, beatmapKey); };
-        if (!beatmapKey->IsValid()) {
+        static auto base = [](GlobalNamespace::EditableBeatmapSelectionView* self, by_ref<const GlobalNamespace::BeatmapKey> beatmapKey){ return i2c::run_method<void>(self, method, beatmapKey); };
+        auto key = *beatmapKey;
+        if (!key.IsValid()) {
             DEBUG("beatmapkey was invalid");
             return base(this, beatmapKey);
         }
@@ -31,7 +33,7 @@ namespace MultiplayerCore::UI {
             return base(this, beatmapKey);
         }
 
-        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine((*beatmapKey), levelHash)));
+        StartCoroutine(custom_types::Helpers::CoroutineHelper::New(SetBeatmapCoroutine(key, levelHash)));
     }
 
     custom_types::Helpers::Coroutine CustomEditableBeatmapSelectionView::SetBeatmapCoroutine(GlobalNamespace::BeatmapKey beatmapKey, std::string levelHash) {
@@ -61,7 +63,7 @@ namespace MultiplayerCore::UI {
 
         level = _mpBeatmapLevelProvider->AddBasicBeatmapDataToLevel(level, beatmapKey, packet);
 
-        _levelBar->Setup(level, beatmapKey.difficulty, beatmapKey.beatmapCharacteristic);
+        _levelBar->Setup(level, beatmapKey.difficulty, beatmapKey.characteristic);
         co_return;
     }
 }
